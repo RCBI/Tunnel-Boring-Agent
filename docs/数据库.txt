@@ -1,0 +1,69 @@
+盾构智能播报机器人数据库详细设计文档
+一、设计概述
+设计总量：共 3 张核心数据表 设计目标：存储盾构实时掘进数据源、播报历史日志、播报规则阈值配置，支撑司机语音自动播报、故障预警、后台查询配置；采用 MySQL InnoDB 引擎，字段规范下划线命名，建立主键、联合索引保障实时数据读写性能。 三张表分别为：tbm_real_param（盾构掘进实时参数表）、voice_broadcast_record（播报历史记录表）、voice_broadcast_config（播报配置阈值表）
+二、表 1：tbm_real_param 盾构掘进实时参数表
+作用：存储盾构工控系统实时上传设备运行数据，作为机器人播报原始数据源，每 1 秒采集一条设备数据
+表格
+字段名	数据类型	长度	是否非空	默认值	字段说明
+id	BIGINT	20	是	自增主键	唯一数据 ID，主键索引
+tbm_code	VARCHAR	32	是	无	盾构设备编号，区分多台盾构机，普通索引
+ring_num	INT	10	是	0	当前掘进环号
+total_thrust	DECIMAL	12,2	是	0.00	总推力，单位 kN
+cutter_torque	DECIMAL	12,2	是	0.00	刀盘扭矩，单位 kN?m
+cutter_speed	DECIMAL	6,2	是	0.00	刀盘转速，单位 rpm
+advance_speed	DECIMAL	6,2	是	0.00	掘进速度，单位 mm/min
+soil_pressure	DECIMAL	6,3	是	0.000	土仓压力，单位 bar
+screw_speed	DECIMAL	6,2	是	0.00	螺旋输送机转速 rpm
+horizontal_offset	INT	6	是	0	水平轴线偏差 mm
+vertical_offset	INT	6	是	0	竖直轴线偏差 mm
+grout_pressure	DECIMAL	6,3	是	0.000	同步注浆压力 MPa
+collect_time	DATETIME	0	是	当前时间	数据采集时间戳，联合索引 (tbm_code,collect_time)
+本表补充说明
+1.索引：主键 id；普通索引 tbm_code；联合索引 (tbm_code,collect_time)，用于按设备 + 时间查询历史掘进数据；
+2.数据来源：盾构工控设备实时接口推送，为本机器人播报数据底层来源；
+3.关联关系：本表 id 无外键，播报记录表通过 tbm_code+collect_time 关联匹配对应掘进参数。
+三、表 2：voice_broadcast_record 播报历史记录表
+作用：记录机器人每一次语音播报完整日志，支持后台历史播报查询、故障追溯、播报频次统计
+表格
+字段名	数据类型	长度	是否非空	默认值	字段说明
+record_id	BIGINT	20	是	自增主键	播报记录唯一 ID，主键索引
+tbm_code	VARCHAR	32	是	无	对应盾构设备编号，关联实时参数表
+config_id	BIGINT	20	是	0	播报规则配置 ID，关联配置表主键
+broadcast_type	TINYINT	1	是	1	播报类型：1 = 常规掘进播报 2 = 故障预警播报 3 = 安全提示播报
+broadcast_content	VARCHAR	500	是	无	实际播报语音文字内容
+trigger_value	VARCHAR	200	是	无	触发本次播报的盾构参数数值
+trigger_reason	VARCHAR	300	是	无	播报触发原因（如土仓压力超出阈值、掘进速度异常）
+driver_name	VARCHAR	20	否	空	当班盾构司机姓名
+broadcast_time	DATETIME	0	是	当前时间	播报触发时间，联合索引 (tbm_code,broadcast_time)
+play_status	TINYINT	1	是	1	播报状态：1 = 播放成功 2 = 播放失败 3 = 静音跳过
+fail_msg	VARCHAR	200	否	空	播放失败原因，仅 play_status=2 时填充
+本表补充说明
+1.索引：主键 record_id；联合索引 (tbm_code,broadcast_time)，快速筛选单台设备指定时段播报记录；
+2.关联逻辑：tbm_code 匹配实时参数表，config_id 匹配播报配置表；
+3.业务用途：后台历史播报页面查询、异常工况复盘、司机操作记录追溯。
+四、表 3：voice_broadcast_config 播报配置阈值表
+作用：维护所有播报规则、参数预警阈值、语音文案，后台页面可新增 / 编辑 / 启用 / 停用播报规则
+表格
+字段名	数据类型	长度	是否非空	默认值	字段说明
+config_id	BIGINT	20	是	自增主键	规则配置唯一 ID，主键索引
+tbm_code	VARCHAR	32	否	空	设备编号，空代表全设备通用规则
+param_name	VARCHAR	30	是	无	监控参数名称，如 total_thrust、soil_pressure
+broadcast_type	TINYINT	1	是	1	播报类型：1 常规 2 故障预警 3 安全提示
+upper_limit	DECIMAL	12,3	否	NULL	参数上限阈值，超出触发播报
+lower_limit	DECIMAL	12,3	否	NULL	参数下限阈值，低于触发播报
+voice_text	VARCHAR	500	是	无	标准播报语音文案模板
+broadcast_interval	INT	6	是	30	重复播报间隔，单位秒
+sort	INT	4	是	10	规则排序权重，数字越小优先级越高
+status	TINYINT	1	是	1	规则状态：1 启用 0 停用
+create_user	VARCHAR	20	是	无	配置创建人
+update_user	VARCHAR	20	否	空	配置最后修改人
+created_at	DATETIME	0	是	当前时间	创建时间
+updated_at	DATETIME	0	是	当前时间	最后更新时间
+本表补充说明
+1.索引：主键 config_id；普通索引 tbm_code，快速筛选单设备专属播报规则；
+2.业务逻辑：机器人实时读取本表阈值，对比 tbm_real_param 实时参数，满足阈值则生成播报记录；
+3.后台对应页面：播报参数配置页，支持新增、修改、启停播报规则。
+五、三张表关联关系说明
+1.tbm_real_param（实时参数） ? voice_broadcast_record（播报记录）：通过 tbm_code 设备编号关联，一条实时参数可触发多条播报记录；
+2.voice_broadcast_config（配置规则） ? voice_broadcast_record（播报记录）：通过 config_id 一对一关联，每条播报对应一条配置规则；
+3.整体数据流：盾构设备推送实时参数存入 tbm_real_param → 系统读取 voice_broadcast_config 阈值对比判断 → 满足条件生成播报、写入 voice_broadcast_record 日志。

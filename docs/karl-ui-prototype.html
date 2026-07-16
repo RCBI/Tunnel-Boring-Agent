@@ -323,6 +323,119 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
     }
+
+    /* V3 operating layout: denser engineering telemetry and reference-led charts. */
+    .topbar { grid-template-columns: minmax(270px,.75fr) minmax(630px,1.7fr) minmax(270px,.72fr); }
+    .run-meta { gap: 15px; }
+    .boring-state { min-width: 190px; }
+    .state-options { display: flex; gap: 4px; }
+    .state-option { font-style: normal; font-size: 10px; font-weight: 650; color: #697888; padding: 4px 7px; border-radius: 6px; background: rgba(255,255,255,.025); }
+    .state-option.active { color: var(--green); background: rgba(77,216,160,.1); box-shadow: inset 0 0 0 1px rgba(77,216,160,.22); }
+
+    .main { grid-template-columns: minmax(480px,43%) minmax(0,57%); }
+    .left-column { grid-template-rows: auto 140px minmax(0,1fr); }
+    .right-column { grid-template-rows: minmax(245px,1.02fr) minmax(300px,1.15fr) auto; }
+    .speed-card { min-height: 140px; }
+    .speed-primary { padding: 17px 22px; }
+    .speed-number { font-size: clamp(56px,4.7vw,78px); }
+
+    .drive-grid { min-height: 0; display: grid; grid-template-columns: minmax(220px,.84fr) minmax(315px,1.16fr); gap: 14px; }
+    .attitude-v2 { padding: 16px; min-height: 0; display: grid; grid-template-rows: auto minmax(0,1fr) auto; }
+    .attitude-stage { min-height: 0; display: grid; align-content: center; justify-items: center; gap: 11px; }
+    .target-v2 { width: min(13vw,164px); max-height: 164px; background: repeating-radial-gradient(circle, transparent 0 21px, rgba(170,195,220,.10) 22px 23px), linear-gradient(90deg,transparent 49.5%,rgba(170,195,220,.20) 50%,transparent 50.5%),linear-gradient(transparent 49.5%,rgba(170,195,220,.20) 50%,transparent 50.5%); }
+    .pose-marker { position: absolute; display: block; transform: translate(-50%,-50%); z-index: 2; }
+    .cutter-pose { left: calc(50% + 18px); top: calc(50% + 12px); width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 15px solid var(--orange); filter: drop-shadow(0 0 7px rgba(255,138,61,.75)); }
+    .tail-pose { left: calc(50% + 11px); top: calc(50% + 8px); width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--green); background: #14211f; box-shadow: 0 0 8px rgba(77,216,160,.6); }
+    .target-pose { left: calc(50% + 7px); top: calc(50% + 4px); width: 14px; height: 14px; border: 2px solid #72bfff; transform: translate(-50%,-50%) rotate(45deg); background: rgba(41,167,255,.16); box-shadow: 0 0 7px rgba(41,167,255,.55); }
+    .pose-legend { width: 100%; display: grid; gap: 6px; color: #9eacba; font-size: 10px; }
+    .pose-legend span { display: flex; align-items: center; gap: 8px; }
+    .legend-shape { width: 10px; height: 10px; flex: 0 0 auto; display: inline-block; }
+    .legend-shape.triangle { width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid var(--orange); }
+    .legend-shape.circle { border-radius: 50%; border: 2px solid var(--green); }
+    .legend-shape.target-symbol { border: 2px solid #72bfff; transform: rotate(45deg); }
+    .angle-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .angle-strip div { padding: 9px; background: rgba(255,255,255,.025); border-radius: 9px; }
+    .angle-strip span { display:block; color:var(--muted); font-size:9px; }
+    .angle-strip strong { display:block; margin-top:4px; font-size:15px; font-weight:650; }
+
+    .parameters-v2 { padding: 14px; min-height: 0; display: grid; grid-template-rows: auto auto minmax(82px,1fr) auto; gap: 9px; }
+    .core-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .core-param { min-width:0; padding:8px 9px; border-radius:9px; background:rgba(255,255,255,.025); border:1px solid rgba(170,195,220,.08); }
+    .core-param > div:first-child { display:flex; align-items:baseline; justify-content:space-between; gap:5px; }
+    .core-param strong { font-size:14px; font-weight:650; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .core-param strong small { color:var(--muted); font-size:8px; font-weight:500; }
+    .range-editor { display:grid; grid-template-columns:25px 1fr 25px; align-items:center; gap:4px; margin-top:6px; }
+    .range-editor span { color:var(--muted); font-size:8px; text-align:center; white-space:nowrap; }
+    .range-editor b { color:#b9c6d2; font-weight:650; }
+    .range-adjust { width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.035);color:#a9b6c2;cursor:pointer; }
+    .range-adjust:active { transform:scale(.94); }
+
+    .pressure-block { min-height:80px; padding:8px 9px 6px; border-radius:10px; background:rgba(255,255,255,.018); display:grid; grid-template-rows:auto minmax(42px,1fr) auto; }
+    .pressure-head { display:flex; justify-content:space-between; align-items:center; font-size:10px; }
+    .pressure-head > span { display:flex; align-items:center; gap:6px; }
+    .pressure-head .tag { font-size:8px; padding:2px 5px; }
+    .pressure-head strong { font-size:15px; font-weight:650; }
+    .pressure-head small { color:var(--muted);font-size:8px; }
+    #pressureCanvas { width:100%;height:100%;min-height:42px; }
+    .pressure-legend { display:flex;justify-content:space-between;color:var(--muted);font-size:8px; }
+    .pressure-legend span::before { content:"";display:inline-block;width:8px;height:2px;background:var(--mode);vertical-align:middle;margin-right:4px; }
+    .pressure-legend span:nth-child(2)::before { background:#fff; }
+    .pressure-legend span:nth-child(3)::before { background:var(--red);opacity:.7; }
+
+    .material-list { display:grid;grid-template-columns:1fr 1fr;gap:7px; }
+    .material-progress { padding:8px 9px;border-radius:9px;background:rgba(255,255,255,.025); }
+    .material-progress > div:first-child { display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:9px; }
+    .material-progress strong { font-size:11px;font-weight:650;white-space:nowrap; }
+    .progress-track { height:5px;margin:7px 0 4px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden; }
+    .progress-track i { display:block;height:100%;background:var(--mode);border-radius:inherit; }
+    .progress-track.grease i { background:var(--green); }
+    .material-progress small { display:block;color:var(--muted);font-size:8px; }
+
+    .intel-row { grid-template-columns:minmax(440px,1.22fr) minmax(270px,.78fr); }
+    .goal-card-v2 { padding:15px 17px; }
+    .goal-card-v2 .goal-header { margin-bottom:9px; }
+    .target-groups { display:grid;gap:7px; }
+    .target-group { display:grid;grid-template-columns:92px 1fr;grid-template-rows:auto 5px;column-gap:10px;row-gap:6px;padding:8px 9px;border-radius:10px;background:rgba(255,255,255,.022); }
+    .target-group-head { grid-row:1;display:flex;flex-direction:column;justify-content:center;gap:5px; }
+    .target-group-head strong { font-size:11px; }
+    .target-group-head span { color:var(--muted);font-size:8px; }
+    .target-group-head b { color:#dbe5ed;font-size:11px; }
+    .target-values { display:grid;grid-template-columns:1fr 1fr;gap:5px 7px; }
+    .target-values.two { align-content:center; }
+    .target-values span { display:flex;justify-content:space-between;gap:5px;padding:5px 6px;border-radius:6px;background:rgba(255,255,255,.025);color:var(--muted);font-size:8px;white-space:nowrap; }
+    .target-values b { color:#cbd6df;font-weight:650; }
+    .completion { grid-column:1/-1;height:4px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden; }
+    .completion i { display:block;height:100%;border-radius:inherit;background:var(--mode); }
+    .completion.amber i { background:var(--amber); }
+    .completion.green i { background:var(--green); }
+    .trend-card { padding:15px; }
+    .trend-canvas { min-height:190px; }
+    .dock { grid-template-columns:repeat(4,1fr); }
+
+    @media (max-width: 1280px) {
+      .topbar { grid-template-columns:260px 1fr 250px; }
+      .brand-sub { display:none; }
+      .run-meta { gap:9px; }
+      .boring-state { min-width:165px; }
+      .main { grid-template-columns:46% 54%; }
+      .drive-grid { grid-template-columns:minmax(190px,.72fr) minmax(300px,1.28fr); }
+      .target-v2 { width:140px; }
+      .intel-row { grid-template-columns:1.15fr .85fr; }
+      .target-group { grid-template-columns:80px 1fr; }
+    }
+
+    @media (max-width: 920px), (max-height: 690px) {
+      .boring-state { display:none; }
+      .topbar { grid-template-columns:1fr auto; }
+      .run-meta { display:none; }
+      .main { display:block; }
+      .left-column, .right-column { grid-template-rows:auto; }
+      .drive-grid { grid-template-columns:1fr; }
+      .parameters-v2 { min-height:470px; }
+      .intel-row { grid-template-columns:1fr; }
+      .target-v2 { width:160px; }
+      .trend-canvas { min-height:180px; }
+    }
   </style>
 </head>
 <body>
@@ -339,6 +452,7 @@
       <div class="run-meta" aria-label="运行信息">
         <div class="meta-block"><span class="meta-label">当前环号</span><span class="meta-value">RING 356</span></div>
         <div class="meta-block"><span class="meta-label">里程</span><span class="meta-value">K12+345.8</span></div>
+        <div class="meta-block boring-state"><span class="meta-label">掘进状态 · 采集系统</span><span class="meta-value state-options"><i class="state-option active">推进</i><i class="state-option">拼装</i><i class="state-option">停机</i></span></div>
         <div class="meta-block"><span class="meta-label">系统时间</span><span class="meta-value" id="clock">14:26:08</span></div>
         <div class="meta-block"><span class="meta-label">链路状态</span><span class="meta-value"><i class="status-dot"></i>正常</span></div>
       </div>
@@ -362,7 +476,7 @@
             <div class="speed-reading"><strong class="speed-number" id="speedValue">23</strong><span class="speed-unit">mm/min</span></div>
           </div>
           <div class="speed-control">
-            <div class="max-label">速度上限 · MAX</div>
+            <div class="max-label">允许区间 · 15 — MAX</div>
             <div class="max-value" id="maxSpeed">30</div>
             <div class="stepper">
               <button id="speedDown" aria-label="降低速度上限">−</button>
@@ -372,40 +486,39 @@
           </div>
         </article>
 
-        <div class="telemetry-row">
-          <article class="card attitude">
-            <div class="card-title"><span>姿态仪表</span><span class="tag">自动纠偏</span></div>
-            <div class="attitude-content">
-              <div class="target" aria-label="盾构姿态十字靶图">
-                <span class="axis-label top">高程</span><span class="axis-label right">水平</span><i class="target-dot"></i>
+        <div class="drive-grid">
+          <article class="card attitude attitude-v2">
+            <div class="card-title"><span>盾构姿态</span><span class="tag" id="attitudeModeTag">自动控制</span></div>
+            <div class="attitude-stage">
+              <div class="target target-v2" aria-label="切口、盾尾与本环目标姿态靶图">
+                <span class="axis-label top">高程 +</span><span class="axis-label right">水平 +</span>
+                <i class="pose-marker target-pose" aria-label="本环目标"></i>
+                <i class="pose-marker cutter-pose" aria-label="切口位置"></i>
+                <i class="pose-marker tail-pose" aria-label="盾尾位置"></i>
               </div>
-              <div class="attitude-values">
-                <div><div class="metric-label">水平偏差</div><div class="metric-value">+12<small>mm</small><span class="arrow">→</span></div></div>
-                <div><div class="metric-label">高程偏差</div><div class="metric-value">−8<small>mm</small><span class="arrow">↓</span></div></div>
-                <div><div class="metric-label">滚动 / 俯仰</div><div class="metric-value">0.3°<small>/ −0.1°</small></div></div>
-              </div>
+              <div class="pose-legend"><span><i class="legend-shape triangle"></i>切口 +12 / −8</span><span><i class="legend-shape circle"></i>盾尾 +8 / −6</span><span><i class="legend-shape target-symbol"></i>本环目标 +5 / −3</span></div>
             </div>
+            <div class="angle-strip"><div><span>滚动角</span><strong>+0.30°</strong></div><div><span>俯仰角</span><strong>−0.10°</strong></div></div>
           </article>
 
-          <article class="card parameters">
-            <div class="card-title"><span>关键参数与安全边界</span><span class="tag">4 项正常</span></div>
-            <div class="parameter-list">
-              <div class="parameter">
-                <div><div class="parameter-name">切口压力</div><div class="parameter-value">2.82 bar</div></div>
-                <div class="bar-wrap"><div class="bar-meta"><span>2.60</span><span>目标 2.85</span><span>3.10</span></div><div class="bar"><div class="bar-fill" style="width: 62%"></div><i class="safe-line" style="left: 92%"></i></div><div class="mini-spark"><i style="height:35%"></i><i style="height:54%"></i><i style="height:43%"></i><i style="height:72%"></i><i style="height:60%"></i><i style="height:68%"></i></div></div>
-              </div>
-              <div class="parameter">
-                <div><div class="parameter-name">总推力</div><div class="parameter-value">32.6 MN</div></div>
-                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span>目标 34.0</span><span>45</span></div><div class="bar"><div class="bar-fill" style="width:72%"></div><i class="safe-line" style="left:94%"></i></div><div class="mini-spark"><i style="height:45%"></i><i style="height:64%"></i><i style="height:51%"></i><i style="height:60%"></i><i style="height:75%"></i><i style="height:70%"></i></div></div>
-              </div>
-              <div class="parameter warning">
-                <div><div class="parameter-name">刀盘扭矩</div><div class="parameter-value">5.26 MN·m</div></div>
-                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span>负载 78%</span><span>6.5</span></div><div class="bar"><div class="bar-fill" style="width:81%; background:linear-gradient(90deg,#cc8a1a,var(--amber))"></div><i class="safe-line" style="left:90%"></i></div><div class="mini-spark"><i style="height:40%"></i><i style="height:54%"></i><i style="height:75%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:84%;background:var(--amber)"></i></div></div>
-              </div>
-              <div class="parameter" id="groutParameter">
-                <div><div class="parameter-name">同步注浆量</div><div class="parameter-value"><span id="groutValue">4.2</span> / <span id="groutTarget">6.5</span> m³</div></div>
-                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span id="groutGoalLabel">目标 6.5</span><span>8.0</span></div><div class="bar"><div class="bar-fill" id="groutFill" style="width:64%"></div><i class="safe-line" style="left:94%"></i></div><div class="mini-spark"><i style="height:30%"></i><i style="height:44%"></i><i style="height:53%"></i><i style="height:61%"></i><i style="height:70%"></i><i style="height:76%"></i></div></div>
-              </div>
+          <article class="card parameters parameters-v2">
+            <div class="card-title"><span>核心参数实时值</span><span class="live">PLC 实时</span></div>
+            <div class="core-list">
+              <div class="core-param" data-param="torque" data-low="3.5" data-high="5.8"><div><span class="parameter-name">刀盘扭矩</span><strong>5.26 <small>MN·m</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.1" aria-label="降低扭矩允许上限">−</button><span>允许 <b class="range-low">3.5</b>—<b class="range-high">5.8</b></span><button class="range-adjust" data-step="0.1" aria-label="提高扭矩允许上限">＋</button></div></div>
+              <div class="core-param" data-param="rpm" data-low="0.8" data-high="1.6"><div><span class="parameter-name">刀盘转速</span><strong>1.26 <small>rpm</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.1" aria-label="降低转速允许上限">−</button><span>允许 <b class="range-low">0.8</b>—<b class="range-high">1.6</b></span><button class="range-adjust" data-step="0.1" aria-label="提高转速允许上限">＋</button></div></div>
+              <div class="core-param" data-param="thrust" data-low="26" data-high="38"><div><span class="parameter-name">总推力</span><strong>32.6 <small>MN</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-1" aria-label="降低总推力允许上限">−</button><span>允许 <b class="range-low">26</b>—<b class="range-high">38</b></span><button class="range-adjust" data-step="1" aria-label="提高总推力允许上限">＋</button></div></div>
+              <div class="core-param" data-param="oil" data-low="12.5" data-high="16.0"><div><span class="parameter-name">分区油压</span><strong>13.8—15.2 <small>MPa</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.5" aria-label="降低油压允许上限">−</button><span>允许 <b class="range-low">12.5</b>—<b class="range-high">16.0</b></span><button class="range-adjust" data-step="0.5" aria-label="提高油压允许上限">＋</button></div></div>
+            </div>
+
+            <div class="pressure-block">
+              <div class="pressure-head"><span>切口压力 <i class="tag">自动控制</i></span><strong>2.82 <small>bar</small></strong></div>
+              <canvas id="pressureCanvas" aria-label="切口压力实时曲线、目标值与允许区间"></canvas>
+              <div class="pressure-legend"><span>实时压力</span><span>目标 2.85</span><span>允许 2.60—3.10</span></div>
+            </div>
+
+            <div class="material-list">
+              <div class="material-progress" id="groutParameter"><div><span>同步注浆</span><strong><span id="groutValue">4.2</span> / <span id="groutTarget">6.5</span> m³</strong></div><div class="progress-track"><i id="groutFill" style="width:64%"></i></div><small id="groutGoalLabel">目标完成 64%</small></div>
+              <div class="material-progress"><div><span>尾部油脂</span><strong>12.6 / 18.0 kg</strong></div><div class="progress-track grease"><i style="width:70%"></i></div><small>目标完成 70%</small></div>
             </div>
           </article>
         </div>
@@ -424,34 +537,28 @@
         </article>
 
         <div class="intel-row">
-          <article class="card goal-card" id="goalCard">
-            <div class="goal-header">
-              <div><div class="card-title">第 356 环 · 阶段控制目标</div><div class="view-sub">自动策略 A-17 · 粉质黏土夹砂层</div></div>
-              <div class="progress-ring"><span>72%</span></div>
+          <article class="card goal-card goal-card-v2" id="goalCard">
+            <div class="goal-header"><div><div class="card-title">第 356 环 · 阶段控制目标</div><div class="view-sub">当前值 / 本环目标 · 自动策略 A-17</div></div><span class="tag" id="goalStatusText">自动执行中</span></div>
+            <div class="target-groups">
+              <section class="target-group"><div class="target-group-head"><strong>姿态</strong><span>完成率 <b>78%</b></span></div><div class="target-values"><span>切口水平 <b>+12 / +5</b></span><span>切口高程 <b>−8 / −3</b></span><span>盾尾水平 <b>+8 / +3</b></span><span>盾尾高程 <b>−6 / −2</b></span></div><div class="completion"><i style="width:78%"></i></div></section>
+              <section class="target-group"><div class="target-group-head"><strong>沉降</strong><span>完成率 <b>72%</b></span></div><div class="target-values"><span>切口前 5m <b>−3.2 mm</b></span><span>切口前 10m <b>−1.8 mm</b></span><span>盾尾上方 <b>−4.6 mm</b></span><span>盾尾后方 <b>−3.9 mm</b></span></div><div class="completion amber"><i style="width:72%"></i></div></section>
+              <section class="target-group"><div class="target-group-head"><strong>管片</strong><span>完成率 <b>91%</b></span></div><div class="target-values two"><span>水平位置 <b>+2 / 0 mm</b></span><span>高程位置 <b>−3 / 0 mm</b></span></div><div class="completion green"><i style="width:91%"></i></div></section>
             </div>
-            <div class="goal-grid">
-              <div class="goal-item"><div class="goal-label">切口压力</div><div class="goal-value">2.85 <small>bar</small></div></div>
-              <div class="goal-item"><div class="goal-label">推速区间</div><div class="goal-value">20—26</div></div>
-              <div class="goal-item"><div class="goal-label">姿态纠偏</div><div class="goal-value">左 3 <small>mm</small></div></div>
-              <div class="goal-item" id="groutGoalItem"><div class="goal-label">同步注浆</div><div class="goal-value"><span id="goalGrout">6.5</span> <small>m³</small></div></div>
-            </div>
-            <div class="goal-status"><span id="goalStatusText">● 自动执行中</span><span>剩余推进 0.4 m</span></div>
+            <span id="goalGrout" hidden>6.5</span><span id="groutGoalItem" hidden></span>
           </article>
 
           <article class="card trend-card">
             <div class="trend-head">
               <div class="card-title">趋势预测</div>
-              <div class="tabs" role="tablist"><button class="tab active" data-trend="settlement">沉降</button><button class="tab" data-trend="attitude">姿态</button><button class="tab" data-trend="pressure">压力</button></div>
+              <div class="tabs" role="tablist"><button class="tab active" data-trend="attitude">姿态</button><button class="tab" data-trend="settlement">沉降</button></div>
             </div>
             <div class="trend-canvas"><canvas id="trendCanvas" aria-label="历史和预测趋势图"></canvas></div>
           </article>
         </div>
 
         <nav class="dock" aria-label="常用功能">
-          <button class="dock-button" data-dock="工序管理"><span class="dock-icon">▤</span><span>工序</span></button>
-          <button class="dock-button" data-dock="生产报表"><span class="dock-icon">▥</span><span>报表</span></button>
-          <button class="dock-button" data-dock="智能诊断"><span class="dock-icon">◇</span><span>诊断</span></button>
-          <button class="dock-button" data-dock="知识库"><span class="dock-icon">▧</span><span>知识库</span></button>
+          <button class="dock-button" data-dock="生产数据"><span class="dock-icon">▥</span><span>数据</span></button>
+          <button class="dock-button" data-dock="工程资料"><span class="dock-icon">▧</span><span>资料</span></button>
           <button class="dock-button" data-dock="报警中心"><span class="dock-icon">△</span><span>报警</span><i class="badge">2</i></button>
           <button class="dock-button" data-dock="交接班"><span class="dock-icon">◒</span><span>交接班</span></button>
         </nav>
@@ -495,7 +602,7 @@
 
   <script>
     (function () {
-      var state = { mode: 'auto', maxSpeed: 30, trend: 'settlement', muted: false, alarmOpen: false, selectedReason: '' };
+      var state = { mode: 'auto', maxSpeed: 30, trend: 'attitude', muted: false, alarmOpen: false, selectedReason: '' };
       var $ = function (selector) { return document.querySelector(selector); };
       var $$ = function (selector) { return Array.prototype.slice.call(document.querySelectorAll(selector)); };
 
@@ -516,17 +623,17 @@
         draw(ctx, rect.width, rect.height);
       }
 
-      function drawTunnel(ctx, w, h) {
+      function drawTunnelPerspectiveStudy(ctx, w, h) {
         ctx.clearRect(0, 0, w, h);
         var bg = ctx.createLinearGradient(0, 0, 0, h);
-        bg.addColorStop(0, '#121d28'); bg.addColorStop(.5, '#0b141d'); bg.addColorStop(1, '#070c12');
+        bg.addColorStop(0, '#172330'); bg.addColorStop(.48, '#0c151e'); bg.addColorStop(1, '#05090e');
         ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
 
         var layers = [
-          { y: .22, amp: 9, c: 'rgba(95,112,102,.16)' },
-          { y: .38, amp: 14, c: 'rgba(133,108,74,.16)' },
-          { y: .56, amp: 12, c: 'rgba(80,91,105,.18)' },
-          { y: .72, amp: 10, c: 'rgba(107,87,68,.14)' }
+          { y: .19, amp: 9, c: 'rgba(92,113,103,.16)' },
+          { y: .35, amp: 13, c: 'rgba(133,105,72,.18)' },
+          { y: .53, amp: 11, c: 'rgba(69,84,98,.20)' },
+          { y: .73, amp: 10, c: 'rgba(103,80,61,.16)' }
         ];
         layers.forEach(function (layer, idx) {
           ctx.beginPath(); ctx.moveTo(0, h * layer.y);
@@ -534,37 +641,148 @@
           ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fillStyle = layer.c; ctx.fill();
         });
 
-        ctx.strokeStyle = 'rgba(150,177,201,.08)'; ctx.lineWidth = 1;
-        for (var gx = 0; gx < w; gx += 56) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
-        for (var gy = 0; gy < h; gy += 48) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
+        var vanX = w * .525;
+        var vanY = h * .42;
 
-        var horizon = h * .55;
-        ctx.fillStyle = 'rgba(4,8,12,.55)';
-        ctx.beginPath(); ctx.moveTo(w * .44, horizon); ctx.lineTo(w * .56, horizon); ctx.lineTo(w * .87, h); ctx.lineTo(w * .13, h); ctx.closePath(); ctx.fill();
+        /* Tunnel void: a dark cylindrical volume with a warm, unlined face ahead. */
+        var tunnelGlow = ctx.createRadialGradient(vanX, vanY, 4, vanX, vanY, Math.max(w, h) * .62);
+        tunnelGlow.addColorStop(0, 'rgba(104,78,49,.32)');
+        tunnelGlow.addColorStop(.18, 'rgba(22,28,31,.96)');
+        tunnelGlow.addColorStop(.7, 'rgba(5,9,13,.94)');
+        ctx.fillStyle = tunnelGlow;
+        ctx.beginPath();
+        ctx.ellipse(w * .49, h * .58, w * .54, h * .69, -.025, 0, Math.PI * 2);
+        ctx.fill();
 
-        ctx.strokeStyle = 'rgba(77,216,160,.32)'; ctx.lineWidth = 8;
-        ctx.beginPath(); ctx.moveTo(w * .16, h); ctx.quadraticCurveTo(w * .32, h * .68, w * .46, horizon); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(w * .84, h); ctx.quadraticCurveTo(w * .68, h * .68, w * .54, horizon); ctx.stroke();
-        for (var r = 0; r < 7; r++) {
-          var t = r / 7;
-          var yy = h - Math.pow(t, .65) * (h - horizon);
-          var half = (1 - t) * w * .34 + t * w * .05;
-          ctx.strokeStyle = 'rgba(77,216,160,' + (.22 + t * .18) + ')'; ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.moveTo(w / 2 - half, yy); ctx.lineTo(w / 2 + half, yy); ctx.stroke();
+        /* Concrete segment rings recede toward one shared vanishing point. */
+        var rings = [0, .11, .23, .36, .50, .63, .74, .83, .90];
+        rings.forEach(function (depth, index) {
+          var ease = Math.pow(depth, .78);
+          var cx = w * .49 + (vanX - w * .49) * ease;
+          var cy = h * .59 + (vanY - h * .59) * ease;
+          var rx = w * (.52 - .455 * ease);
+          var ry = h * (.66 - .575 * ease);
+          var lined = index < 6;
+
+          ctx.save();
+          ctx.strokeStyle = lined ? 'rgba(112,143,140,' + (.29 + index * .027) + ')' : 'rgba(133,103,71,.20)';
+          ctx.lineWidth = lined ? Math.max(2.2, 7 - index * .65) : 2;
+          ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, -.025, 0, Math.PI * 2); ctx.stroke();
+
+          if (lined) {
+            ctx.strokeStyle = 'rgba(160,181,176,.12)';
+            ctx.lineWidth = 1;
+            for (var joint = 0; joint < 10; joint++) {
+              var angle = -Math.PI * .92 + joint * Math.PI * .184 + (index % 2) * .08;
+              var x1 = cx + Math.cos(angle) * (rx - 2);
+              var y1 = cy + Math.sin(angle) * (ry - 2);
+              var x2 = cx + Math.cos(angle) * (rx + Math.max(7, 14 - index));
+              var y2 = cy + Math.sin(angle) * (ry + Math.max(7, 14 - index));
+              ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            }
+          }
+          ctx.restore();
+        });
+
+        /* Longitudinal seams make the lining read as a tube rather than a road. */
+        ctx.strokeStyle = 'rgba(102,144,140,.17)'; ctx.lineWidth = 1.4;
+        [-.78, -.42, 0, .42, .78].forEach(function (s) {
+          var startX = w * .49 + Math.sin(s * Math.PI / 2) * w * .51;
+          var startY = h * .59 + Math.cos(s * Math.PI / 2) * h * .64;
+          ctx.beginPath(); ctx.moveTo(startX, startY); ctx.quadraticCurveTo((startX + vanX) * .52, (startY + vanY) * .52, vanX, vanY); ctx.stroke();
+        });
+
+        /* Service floor and narrow rails stay subordinate to the circular tunnel. */
+        var floorGrad = ctx.createLinearGradient(0, vanY, 0, h);
+        floorGrad.addColorStop(0, 'rgba(22,30,34,.18)'); floorGrad.addColorStop(1, 'rgba(20,28,33,.92)');
+        ctx.fillStyle = floorGrad;
+        ctx.beginPath(); ctx.moveTo(vanX - w*.018, vanY + h*.035); ctx.lineTo(vanX + w*.022, vanY + h*.035); ctx.lineTo(w*.72, h); ctx.lineTo(w*.25, h); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(151,170,177,.30)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(w*.37,h); ctx.lineTo(vanX-.009*w,vanY+h*.04); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w*.60,h); ctx.lineTo(vanX+.008*w,vanY+h*.04); ctx.stroke();
+        for (var sleeper = 0; sleeper < 8; sleeper++) {
+          var st = sleeper / 8;
+          var sy = h - Math.pow(st, .66) * (h - vanY - h*.04);
+          var sh = (1-st)*w*.13 + 4;
+          ctx.strokeStyle = 'rgba(129,147,153,' + (.22 + st*.18) + ')'; ctx.lineWidth = Math.max(1, 3-st*2);
+          ctx.beginPath(); ctx.moveTo(w*.485-sh, sy); ctx.lineTo(w*.485+sh, sy); ctx.stroke();
         }
 
-        ctx.setLineDash([8, 8]); ctx.strokeStyle = '#29a7ff'; ctx.lineWidth = 2.2; ctx.shadowColor = '#29a7ff'; ctx.shadowBlur = 10;
-        ctx.beginPath(); ctx.moveTo(w * .49, h); ctx.bezierCurveTo(w * .48, h * .79, w * .51, h * .67, w * .5, horizon); ctx.stroke();
-        ctx.setLineDash([]); ctx.strokeStyle = '#f4f8fb'; ctx.lineWidth = 2; ctx.shadowColor = '#fff'; ctx.shadowBlur = 7;
-        ctx.beginPath(); ctx.moveTo(w * .52, h); ctx.bezierCurveTo(w * .53, h * .82, w * .49, h * .68, w * .505, horizon); ctx.stroke(); ctx.shadowBlur = 0;
+        /* Design and actual axes. */
+        ctx.setLineDash([8, 8]); ctx.strokeStyle = '#29a7ff'; ctx.lineWidth = 2.1; ctx.shadowColor = '#29a7ff'; ctx.shadowBlur = 9;
+        ctx.beginPath(); ctx.moveTo(w * .475, h); ctx.bezierCurveTo(w * .48, h * .78, w * .515, h * .56, vanX, vanY); ctx.stroke();
+        ctx.setLineDash([]); ctx.strokeStyle = '#f4f8fb'; ctx.lineWidth = 1.8; ctx.shadowColor = '#fff'; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.moveTo(w * .505, h); ctx.bezierCurveTo(w * .52, h * .79, w * .5, h * .56, vanX + 2, vanY); ctx.stroke(); ctx.shadowBlur = 0;
 
-        var machineX = w * .5, machineY = h * .67;
-        ctx.save(); ctx.translate(machineX, machineY);
-        ctx.fillStyle = '#d5a62f'; ctx.strokeStyle = '#ffe293'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.ellipse(0, 0, 31, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#553b0d'; ctx.beginPath(); ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#f1c95b'; for (var b = 0; b < 8; b++) { var a = b * Math.PI / 4; ctx.beginPath(); ctx.arc(Math.cos(a)*22, Math.sin(a)*12, 2.5, 0, Math.PI*2); ctx.fill(); }
+        /* TBM in three-quarter view: rear gantry, cylindrical shield and cutterhead. */
+        var scale = Math.max(.72, Math.min(1.18, w / 820));
+        var headX = w * .535, headY = h * .575;
+        var tailX = headX - 94 * scale, tailY = headY + 48 * scale;
+        ctx.save();
+
+        /* Rear gantry frames and service decks. */
+        ctx.strokeStyle = '#c79224'; ctx.lineWidth = 3 * scale;
+        for (var gantry = 0; gantry < 3; gantry++) {
+          var gx = tailX - gantry * 34 * scale;
+          var gy = tailY + gantry * 17 * scale;
+          var gw = (45 + gantry * 6) * scale;
+          var gh = (31 + gantry * 3) * scale;
+          ctx.beginPath(); ctx.moveTo(gx-gw*.48,gy+gh*.45); ctx.lineTo(gx-gw*.43,gy-gh*.38); ctx.lineTo(gx+gw*.45,gy-gh*.34); ctx.lineTo(gx+gw*.5,gy+gh*.46); ctx.closePath(); ctx.stroke();
+          ctx.strokeStyle = 'rgba(233,183,62,.62)'; ctx.lineWidth = 1.3 * scale;
+          ctx.beginPath(); ctx.moveTo(gx-gw*.44,gy); ctx.lineTo(gx+gw*.47,gy); ctx.stroke();
+          ctx.strokeStyle = '#c79224'; ctx.lineWidth = 3 * scale;
+        }
+
+        /* Shield body, shaded as a steel cylinder. */
+        var shieldGrad = ctx.createLinearGradient(tailX, tailY+35*scale, headX, headY-28*scale);
+        shieldGrad.addColorStop(0, '#8b681d'); shieldGrad.addColorStop(.32, '#d6a42b'); shieldGrad.addColorStop(.68, '#efbd3f'); shieldGrad.addColorStop(1, '#8d6518');
+        ctx.fillStyle = shieldGrad; ctx.strokeStyle = '#f3cf66'; ctx.lineWidth = 1.4 * scale;
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY - 25*scale); ctx.lineTo(headX, headY - 31*scale);
+        ctx.quadraticCurveTo(headX + 12*scale, headY, headX, headY + 31*scale);
+        ctx.lineTo(tailX, tailY + 25*scale);
+        ctx.quadraticCurveTo(tailX - 10*scale, tailY, tailX, tailY - 25*scale);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        /* Shield ribs, access hatch and hydraulic details. */
+        ctx.strokeStyle = 'rgba(86,57,9,.52)'; ctx.lineWidth = 2 * scale;
+        [0.28, .54, .78].forEach(function (p) {
+          var rx = tailX + (headX-tailX)*p; var ry = tailY + (headY-tailY)*p;
+          ctx.beginPath(); ctx.ellipse(rx, ry, 8*scale, (25+p*5)*scale, -.11, -Math.PI/2, Math.PI/2); ctx.stroke();
+        });
+        ctx.fillStyle = '#26323a'; ctx.strokeStyle = '#efd374'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(tailX+27*scale, tailY-17*scale, 23*scale, 16*scale, 3*scale); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#70d5ee'; ctx.fillRect(tailX+31*scale, tailY-13*scale, 6*scale, 5*scale);
+        ctx.fillStyle = '#70d5ee'; ctx.fillRect(tailX+40*scale, tailY-13*scale, 6*scale, 5*scale);
+
+        /* Cutterhead face with hub, spokes and cutting tools. */
+        ctx.shadowColor = 'rgba(245,188,56,.42)'; ctx.shadowBlur = 13;
+        var cutterGrad = ctx.createRadialGradient(headX-8*scale, headY-10*scale, 2, headX, headY, 37*scale);
+        cutterGrad.addColorStop(0, '#ffe17b'); cutterGrad.addColorStop(.42, '#d39b22'); cutterGrad.addColorStop(1, '#705015');
+        ctx.fillStyle = cutterGrad; ctx.strokeStyle = '#ffda68'; ctx.lineWidth = 2.2 * scale;
+        ctx.beginPath(); ctx.ellipse(headX, headY, 35*scale, 31*scale, -.10, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#775314'; ctx.lineWidth = 5 * scale;
+        for (var spoke = 0; spoke < 8; spoke++) {
+          var angle = spoke * Math.PI / 4 - .10;
+          ctx.beginPath(); ctx.moveTo(headX,headY); ctx.lineTo(headX+Math.cos(angle)*29*scale,headY+Math.sin(angle)*25*scale); ctx.stroke();
+        }
+        ctx.fillStyle = '#4b3510'; ctx.beginPath(); ctx.ellipse(headX,headY,10*scale,9*scale,-.10,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ffe07a';
+        for (var tool = 0; tool < 12; tool++) {
+          var ta = tool * Math.PI / 6;
+          var tx = headX + Math.cos(ta) * (tool%2 ? 25 : 18) * scale;
+          var ty = headY + Math.sin(ta) * (tool%2 ? 21 : 15) * scale;
+          ctx.beginPath(); ctx.arc(tx,ty,2.4*scale,0,Math.PI*2); ctx.fill();
+        }
         ctx.restore();
+
+        /* Water-rich sand pocket is embedded in the geology, not floating in space. */
+        var pocketX = w * .69, pocketY = h * .31;
+        var pocket = ctx.createRadialGradient(pocketX,pocketY,2,pocketX,pocketY,32);
+        pocket.addColorStop(0,'rgba(65,167,211,.34)'); pocket.addColorStop(1,'rgba(65,167,211,0)');
+        ctx.fillStyle=pocket; ctx.beginPath(); ctx.arc(pocketX,pocketY,32,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(100,196,231,.42)';
+        for(var drop=0;drop<9;drop++){var da=drop*2.3;ctx.beginPath();ctx.arc(pocketX+Math.cos(da)*18,pocketY+Math.sin(da)*13,1.6,0,Math.PI*2);ctx.fill();}
 
         var riskX = w * .67, riskY = h * .33;
         ctx.fillStyle = 'rgba(255,200,87,.18)'; ctx.beginPath(); ctx.arc(riskX, riskY, 18, 0, Math.PI*2); ctx.fill();
@@ -572,36 +790,315 @@
         ctx.font = '10px sans-serif'; ctx.textAlign = 'left'; ctx.fillText('38m', riskX + 22, riskY + 4);
       }
 
-      function drawTrend(ctx, w, h) {
+      function drawTunnelSideDraft(ctx, w, h) {
         ctx.clearRect(0, 0, w, h);
-        var pad = { l: 8, r: 8, t: 10, b: 18 };
-        ctx.strokeStyle = 'rgba(170,195,220,.1)'; ctx.lineWidth = 1;
-        for (var i = 0; i < 4; i++) { var y = pad.t + (h-pad.t-pad.b)*i/3; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke(); }
-        var variants = {
-          settlement: [52,50,54,49,46,44,43,41,39,38],
-          attitude: [45,57,51,55,48,46,44,42,41,40],
-          pressure: [54,49,51,47,52,50,49,48,46,45]
-        };
-        var data = variants[state.trend];
-        var usableW = w-pad.l-pad.r, usableH = h-pad.t-pad.b;
-        function px(idx) { return pad.l + usableW * idx/(data.length-1); }
-        function py(v) { return pad.t + usableH * v/100; }
 
+        /* Continuous soil mass replaces the previous space-like dark field. */
+        var earth = ctx.createLinearGradient(0, 0, 0, h);
+        earth.addColorStop(0, '#34362f');
+        earth.addColorStop(.42, '#2c2c26');
+        earth.addColorStop(1, '#20231f');
+        ctx.fillStyle = earth;
+        ctx.fillRect(0, 0, w, h);
+
+        var strata = [
+          { y: .18, amp: 7, fill: '#454238', stroke: '#686052' },
+          { y: .35, amp: 10, fill: '#353932', stroke: '#5b6258' },
+          { y: .56, amp: 8, fill: '#3a342b', stroke: '#665746' },
+          { y: .76, amp: 7, fill: '#2b312e', stroke: '#505c57' }
+        ];
+        strata.forEach(function (layer, index) {
+          ctx.beginPath();
+          ctx.moveTo(0, h * layer.y);
+          for (var sx = 0; sx <= w; sx += 16) {
+            ctx.lineTo(sx, h * layer.y + Math.sin(sx * .017 + index * 1.7) * layer.amp);
+          }
+          ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+          ctx.fillStyle = layer.fill; ctx.fill();
+          ctx.strokeStyle = layer.stroke; ctx.lineWidth = 1;
+          ctx.beginPath();
+          for (var lx = 0; lx <= w; lx += 16) {
+            var ly = h * layer.y + Math.sin(lx * .017 + index * 1.7) * layer.amp;
+            if (lx === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly);
+          }
+          ctx.stroke();
+        });
+
+        var centerY = h * .62;
+        var innerTop = h * .34;
+        var innerBottom = h * .87;
+        var outerTop = h * .27;
+        var outerBottom = h * .93;
+        var liningEnd = w * .43;
+        var cutterX = w * .68;
+
+        /* Excavated opening, shown as one continuous underground space. */
+        var voidFill = ctx.createLinearGradient(0, innerTop, 0, innerBottom);
+        voidFill.addColorStop(0, '#182126');
+        voidFill.addColorStop(.55, '#11191d');
+        voidFill.addColorStop(1, '#0b1114');
+        ctx.fillStyle = voidFill;
         ctx.beginPath();
-        for (var j=5;j<data.length;j++) { var upper=py(data[j]-9); if(j===5) ctx.moveTo(px(j),upper); else ctx.lineTo(px(j),upper); }
-        for (var k=data.length-1;k>=5;k--) ctx.lineTo(px(k),py(data[k]+10));
-        ctx.closePath(); ctx.fillStyle='rgba(41,167,255,.1)'; ctx.fill();
+        ctx.moveTo(0, innerTop);
+        ctx.lineTo(cutterX, innerTop + h * .015);
+        ctx.quadraticCurveTo(cutterX + h * .18, centerY, cutterX, innerBottom - h * .02);
+        ctx.lineTo(0, innerBottom);
+        ctx.closePath();
+        ctx.fill();
 
-        ctx.strokeStyle='#9aaaba'; ctx.lineWidth=2; ctx.setLineDash([]); ctx.beginPath();
-        data.slice(0,6).forEach(function(v,idx){ if(idx===0)ctx.moveTo(px(idx),py(v)); else ctx.lineTo(px(idx),py(v)); }); ctx.stroke();
-        ctx.strokeStyle='#29a7ff'; ctx.setLineDash([5,5]); ctx.beginPath();
-        data.slice(5).forEach(function(v,idx){ var real=idx+5; if(idx===0)ctx.moveTo(px(real),py(v)); else ctx.lineTo(px(real),py(v)); }); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle='#718294'; ctx.font='9px sans-serif'; ctx.textAlign='left'; ctx.fillText('历史',pad.l,h-4); ctx.textAlign='right'; ctx.fillText('预测 +5环',w-pad.r,h-4);
+        /* Thick segmental lining above and below the completed tunnel. */
+        var lining = ctx.createLinearGradient(0, outerTop, 0, outerBottom);
+        lining.addColorStop(0, '#66706e');
+        lining.addColorStop(.48, '#384340');
+        lining.addColorStop(1, '#26322f');
+        ctx.fillStyle = lining;
+        ctx.beginPath();
+        ctx.moveTo(0, outerTop); ctx.lineTo(liningEnd, outerTop + h*.018);
+        ctx.lineTo(liningEnd, innerTop + h*.012); ctx.lineTo(0, innerTop); ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0, innerBottom); ctx.lineTo(liningEnd, innerBottom - h*.012);
+        ctx.lineTo(liningEnd, outerBottom - h*.018); ctx.lineTo(0, outerBottom); ctx.closePath(); ctx.fill();
+
+        ctx.strokeStyle = '#88908d'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(0, innerTop); ctx.lineTo(liningEnd, innerTop+h*.012); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, innerBottom); ctx.lineTo(liningEnd, innerBottom-h*.012); ctx.stroke();
+
+        /* Ring joints and staggered segment joints reinforce the concrete tube. */
+        var ringWidth = Math.max(34, w * .052);
+        for (var ringX = 12; ringX < liningEnd; ringX += ringWidth) {
+          ctx.strokeStyle = 'rgba(18,27,26,.58)'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(ringX, outerTop); ctx.lineTo(ringX, innerTop); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(ringX, innerBottom); ctx.lineTo(ringX, outerBottom); ctx.stroke();
+          ctx.strokeStyle = 'rgba(191,202,197,.17)'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(ringX-ringWidth*.5, (outerTop+innerTop)*.5); ctx.lineTo(ringX, (outerTop+innerTop)*.5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(ringX, (innerBottom+outerBottom)*.5); ctx.lineTo(ringX+ringWidth*.5, (innerBottom+outerBottom)*.5); ctx.stroke();
+        }
+
+        /* Working floor, rails and drainage channel. */
+        ctx.fillStyle = '#202a2d';
+        ctx.beginPath(); ctx.moveTo(0, h*.81); ctx.lineTo(cutterX, h*.805); ctx.lineTo(cutterX, innerBottom); ctx.lineTo(0, innerBottom); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#0a0e10'; ctx.fillRect(0, h*.835, cutterX, h*.022);
+        ctx.strokeStyle = '#818b8b'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(0,h*.80); ctx.lineTo(cutterX,h*.795); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,h*.855); ctx.lineTo(cutterX,h*.848); ctx.stroke();
+        ctx.strokeStyle = '#3f494a'; ctx.lineWidth = 3;
+        for (var sleeperX = 5; sleeperX < cutterX; sleeperX += 27) {
+          ctx.beginPath(); ctx.moveTo(sleeperX,h*.79); ctx.lineTo(sleeperX,h*.865); ctx.stroke();
+        }
+
+        /* Buried utility pipe gives the geology a readable scale. */
+        ctx.strokeStyle = '#778b89'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(w*.70,h*.20); ctx.lineTo(w*.96,h*.17); ctx.stroke();
+        ctx.strokeStyle = '#a7b4b0'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(w*.70,h*.20); ctx.lineTo(w*.96,h*.17); ctx.stroke();
+
+        /* Water-rich sand is a continuous stratum patch, never floating particles. */
+        var riskLeft = w * .76;
+        var riskRight = w * .96;
+        ctx.fillStyle = 'rgba(55,121,145,.27)';
+        ctx.beginPath();
+        ctx.moveTo(riskLeft,h*.30); ctx.lineTo(riskRight,h*.28); ctx.lineTo(riskRight,h*.72); ctx.lineTo(riskLeft,h*.69); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(91,171,197,.34)'; ctx.lineWidth = 1;
+        for (var hatch = -2; hatch < 12; hatch++) {
+          ctx.beginPath(); ctx.moveTo(riskLeft+hatch*18,h*.69); ctx.lineTo(riskLeft+hatch*18+80,h*.30); ctx.stroke();
+        }
+
+        /* Machine geometry is a strict side elevation on one horizontal axis. */
+        var bodyTop = h * .45;
+        var bodyBottom = h * .75;
+        var bodyTail = w * .38;
+        var bodyNose = cutterX - 8;
+        var bodyGrad = ctx.createLinearGradient(0, bodyTop, 0, bodyBottom);
+        bodyGrad.addColorStop(0, '#f4c64d');
+        bodyGrad.addColorStop(.2, '#d59c24');
+        bodyGrad.addColorStop(.66, '#a66f13');
+        bodyGrad.addColorStop(1, '#6f4811');
+        ctx.fillStyle = bodyGrad; ctx.strokeStyle = '#f6d778'; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(bodyTail,bodyTop);
+        ctx.lineTo(bodyNose,bodyTop);
+        ctx.quadraticCurveTo(bodyNose+12,centerY,bodyNose,bodyBottom);
+        ctx.lineTo(bodyTail,bodyBottom);
+        ctx.quadraticCurveTo(bodyTail-11,centerY,bodyTail,bodyTop);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        /* Shield ribs, tail seal and access modules. */
+        [bodyTail+8, bodyTail+(bodyNose-bodyTail)*.38, bodyTail+(bodyNose-bodyTail)*.72].forEach(function (ribX, ribIndex) {
+          ctx.strokeStyle = ribIndex === 0 ? '#4f3918' : 'rgba(82,54,11,.58)';
+          ctx.lineWidth = ribIndex === 0 ? 5 : 2;
+          ctx.beginPath(); ctx.moveTo(ribX,bodyTop+2); ctx.lineTo(ribX,bodyBottom-2); ctx.stroke();
+        });
+        ctx.fillStyle = '#263238'; ctx.strokeStyle = '#e8c765'; ctx.lineWidth = 1;
+        ctx.fillRect(bodyTail+25,bodyTop+15,(bodyNose-bodyTail)*.25,h*.065); ctx.strokeRect(bodyTail+25,bodyTop+15,(bodyNose-bodyTail)*.25,h*.065);
+        ctx.fillStyle = '#7ac7d8';
+        ctx.fillRect(bodyTail+31,bodyTop+21,9,h*.025);
+        ctx.fillRect(bodyTail+44,bodyTop+21,9,h*.025);
+
+        /* Segment erector and screw conveyor are visible in cutaway. */
+        ctx.strokeStyle = 'rgba(38,40,31,.72)'; ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.arc(bodyNose-(bodyNose-bodyTail)*.34,centerY,h*.085,-Math.PI*.78,Math.PI*.78); ctx.stroke();
+        ctx.strokeStyle = '#344149'; ctx.lineWidth = 9;
+        ctx.beginPath(); ctx.moveTo(bodyNose-18,bodyBottom-12); ctx.lineTo(bodyTail-55,h*.80); ctx.stroke();
+        ctx.strokeStyle = '#869394'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(bodyNose-18,bodyBottom-12); ctx.lineTo(bodyTail-55,h*.80); ctx.stroke();
+
+        /* Cutterhead is edge-on in side view, aligned with the shield axis. */
+        ctx.fillStyle = '#bc7f18'; ctx.strokeStyle = '#ffdc6d'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(cutterX,centerY,Math.max(8,w*.014),h*.172,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#e8ad2f';
+        ctx.fillRect(cutterX-7,bodyTop-6,14,bodyBottom-bodyTop+12);
+        ctx.fillStyle = '#ffdb68';
+        for (var toothY = bodyTop-5; toothY <= bodyBottom+5; toothY += h*.038) {
+          ctx.beginPath();
+          ctx.moveTo(cutterX+7,toothY-3); ctx.lineTo(cutterX+14,toothY); ctx.lineTo(cutterX+7,toothY+3); ctx.closePath(); ctx.fill();
+        }
+        ctx.fillStyle = '#59380b';
+        ctx.beginPath(); ctx.arc(cutterX,centerY,7,0,Math.PI*2); ctx.fill();
+
+        /* Rear gantries continue on the same side-elevation baseline. */
+        var gantryStart = w * .08;
+        var gantryEnd = bodyTail - 8;
+        var moduleW = (gantryEnd-gantryStart)/3;
+        for (var module = 0; module < 3; module++) {
+          var mx = gantryStart + module*moduleW;
+          var myTop = h*(.52 - module*.012);
+          ctx.strokeStyle = '#b7801c'; ctx.lineWidth = 3;
+          ctx.strokeRect(mx,myTop,moduleW-6,h*.26);
+          ctx.strokeStyle = 'rgba(238,190,69,.60)'; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(mx,myTop+h*.09); ctx.lineTo(mx+moduleW-6,myTop+h*.09); ctx.stroke();
+          ctx.fillStyle = module === 1 ? '#304044' : '#4d4d3e';
+          ctx.fillRect(mx+7,myTop+h*.11,moduleW-20,h*.09);
+          ctx.fillStyle = '#778684'; ctx.fillRect(mx+10,myTop+h*.12,moduleW-27,h*.018);
+        }
+        ctx.strokeStyle = '#d49b25'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(gantryStart,h*.79); ctx.lineTo(bodyTail,h*.79); ctx.stroke();
+
+        /* Design/actual lines stay readable but no longer define the scenery. */
+        ctx.setLineDash([8,7]); ctx.strokeStyle='#29a7ff'; ctx.lineWidth=2; ctx.shadowColor='#29a7ff'; ctx.shadowBlur=7;
+        ctx.beginPath(); ctx.moveTo(0,centerY+3); ctx.bezierCurveTo(w*.28,centerY+2,w*.52,centerY-2,cutterX,centerY); ctx.stroke();
+        ctx.setLineDash([]); ctx.strokeStyle='#f5f8fa'; ctx.lineWidth=1.6; ctx.shadowBlur=4;
+        ctx.beginPath(); ctx.moveTo(0,centerY+10); ctx.bezierCurveTo(w*.27,centerY+12,w*.51,centerY+4,cutterX,centerY+3); ctx.stroke(); ctx.shadowBlur=0;
+
+        /* Clear direction cue and risk marker. */
+        ctx.fillStyle = 'rgba(8,13,15,.76)';
+        ctx.fillRect(w*.51,h*.255,w*.17,22);
+        ctx.fillStyle = '#d8e0df'; ctx.font = '600 10px sans-serif'; ctx.textAlign='left';
+        ctx.fillText('掘进方向  →',w*.525,h*.255+15);
+        var riskX = w*.79, riskY = h*.31;
+        ctx.fillStyle='rgba(255,200,87,.20)'; ctx.beginPath(); ctx.arc(riskX,riskY,17,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#ffc857'; ctx.font='bold 15px sans-serif'; ctx.textAlign='center'; ctx.fillText('!',riskX,riskY+5);
+        ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.fillText('38m',riskX+20,riskY+4);
+      }
+
+      function drawTunnel(ctx, w, h) {
+        ctx.clearRect(0,0,w,h);
+
+        var soil=ctx.createLinearGradient(0,0,0,h);
+        soil.addColorStop(0,'#51615c'); soil.addColorStop(.18,'#35433e'); soil.addColorStop(.5,'#4c4436'); soil.addColorStop(1,'#2b2b25');
+        ctx.fillStyle=soil; ctx.fillRect(0,0,w,h);
+
+        /* Surface and continuous geological layers follow the reference section. */
+        ctx.fillStyle='#293a3d'; ctx.fillRect(0,0,w,h*.13);
+        ctx.fillStyle='#50645f';
+        ctx.beginPath();ctx.moveTo(0,h*.13);for(var sx=0;sx<=w;sx+=18)ctx.lineTo(sx,h*.13+Math.sin(sx*.022)*4);ctx.lineTo(w,h*.23);ctx.lineTo(0,h*.23);ctx.closePath();ctx.fill();
+        var bands=[
+          {y:.22,a:8,c:'#655b49'},
+          {y:.36,a:12,c:'#4b5148'},
+          {y:.52,a:10,c:'#6a5940'},
+          {y:.73,a:8,c:'#3d4036'}
+        ];
+        bands.forEach(function(b,bi){ctx.beginPath();ctx.moveTo(0,h*b.y);for(var x=0;x<=w;x+=20)ctx.lineTo(x,h*b.y+Math.sin(x*.018+bi)*b.a);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=b.c;ctx.fill();});
+
+        /* Simplified surface buildings and foundations give a clear underground scale. */
+        ctx.fillStyle='#70827f';
+        [[.08,.07,.045,.06],[.18,.055,.038,.075],[.27,.08,.055,.05],[.77,.06,.05,.07],[.86,.075,.042,.055]].forEach(function(b){ctx.fillRect(w*b[0],h*b[1],w*b[2],h*b[3]);});
+        ctx.fillStyle='#91a09d';
+        for(var win=0;win<12;win++)ctx.fillRect(w*(.083+win*.018),h*.085,3,4);
+        ctx.strokeStyle='rgba(167,181,176,.42)';ctx.lineWidth=2;
+        [.12,.29,.81,.9].forEach(function(px){for(var pile=0;pile<4;pile++){ctx.beginPath();ctx.moveTo(w*px+pile*5,h*.13);ctx.lineTo(w*px+pile*5,h*.39);ctx.stroke();}});
+
+        var startX=w*.055, jointX=w*.46, cutterX=w*.715;
+        function axisY(x){var t=(x-startX)/(cutterX-startX);return h*(.695-.065*t+.025*Math.sin(t*Math.PI));}
+        function tunnelPath(fromX,toX){ctx.beginPath();ctx.moveTo(fromX,axisY(fromX));for(var px=fromX+8;px<=toX;px+=8)ctx.lineTo(px,axisY(px));}
+        var diameter=Math.max(54,Math.min(76,h*.29));
+
+        /* Finished lining: outer concrete and hollow interior share the same bore. */
+        tunnelPath(startX,jointX+2);ctx.strokeStyle='#9ba6a3';ctx.lineWidth=diameter+10;ctx.lineCap='butt';ctx.stroke();
+        tunnelPath(startX,jointX+2);ctx.strokeStyle='#56625f';ctx.lineWidth=diameter+4;ctx.stroke();
+        tunnelPath(startX,jointX+2);ctx.strokeStyle='#151f22';ctx.lineWidth=diameter-12;ctx.stroke();
+
+        /* Segment rings wrap the lining with no visual gaps. */
+        for(var ringX=startX+12;ringX<jointX;ringX+=Math.max(18,w*.035)){
+          var ry=axisY(ringX);ctx.strokeStyle='rgba(198,210,207,.52)';ctx.lineWidth=1.2;
+          ctx.beginPath();ctx.moveTo(ringX,ry-diameter*.5-4);ctx.lineTo(ringX,ry-diameter*.5+7);ctx.stroke();
+          ctx.beginPath();ctx.moveTo(ringX,ry+diameter*.5-7);ctx.lineTo(ringX,ry+diameter*.5+4);ctx.stroke();
+        }
+
+        /* Shield body continues at exactly the same diameter and axis as the lining. */
+        var shield=ctx.createLinearGradient(0,axisY(jointX)-diameter/2,0,axisY(jointX)+diameter/2);
+        shield.addColorStop(0,'#f3c54b');shield.addColorStop(.26,'#dca32d');shield.addColorStop(.72,'#97651b');shield.addColorStop(1,'#62400e');
+        tunnelPath(jointX-2,cutterX);ctx.strokeStyle=shield;ctx.lineWidth=diameter+6;ctx.lineCap='butt';ctx.stroke();
+        tunnelPath(jointX-2,cutterX);ctx.strokeStyle='rgba(255,224,116,.42)';ctx.lineWidth=2;ctx.stroke();
+
+        /* Shield ribs remain perpendicular to the common longitudinal axis. */
+        [jointX,jointX+(cutterX-jointX)*.26,jointX+(cutterX-jointX)*.55,jointX+(cutterX-jointX)*.82].forEach(function(rx,ri){var cy=axisY(rx);ctx.strokeStyle=ri===0?'#4a3517':'rgba(78,49,8,.56)';ctx.lineWidth=ri===0?5:2;ctx.beginPath();ctx.moveTo(rx,cy-diameter*.5);ctx.lineTo(rx,cy+diameter*.5);ctx.stroke();});
+
+        /* Edge-on cutterhead closes the excavation face and touches the bore. */
+        var cutterY=axisY(cutterX);
+        ctx.fillStyle='#bd7e19';ctx.strokeStyle='#ffe174';ctx.lineWidth=2;
+        ctx.beginPath();ctx.ellipse(cutterX,cutterY,Math.max(10,w*.013),diameter*.55,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#f1b632';ctx.fillRect(cutterX-7,cutterY-diameter*.49,14,diameter*.98);
+        ctx.fillStyle='#ffe073';for(var tooth=0;tooth<9;tooth++){var ty=cutterY-diameter*.48+tooth*diameter*.12;ctx.beginPath();ctx.moveTo(cutterX+7,ty-3);ctx.lineTo(cutterX+14,ty);ctx.lineTo(cutterX+7,ty+3);ctx.closePath();ctx.fill();}
+
+        /* Internal gantries, screw conveyor and equipment sit inside the completed tube. */
+        ctx.strokeStyle='#bd861f';ctx.lineWidth=2;
+        for(var g=0;g<3;g++){var gx=startX+28+g*w*.09;var gy=axisY(gx);var gh=diameter*.56;ctx.strokeRect(gx,gy-gh*.48,w*.075,gh);ctx.fillStyle='#3b4747';ctx.fillRect(gx+7,gy-gh*.14,w*.055,gh*.25);}
+        ctx.strokeStyle='#6f7a79';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(cutterX-18,cutterY+diameter*.28);ctx.lineTo(jointX-55,axisY(jointX-55)+diameter*.28);ctx.stroke();
+        ctx.strokeStyle='#d0d8d5';ctx.lineWidth=1;ctx.stroke();
+
+        /* Actual and design axes are restrained overlays within the tube. */
+        tunnelPath(startX,cutterX);ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.8;ctx.setLineDash([7,6]);ctx.stroke();
+        ctx.setLineDash([]);ctx.strokeStyle='#eef4f5';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(startX,axisY(startX)+7);for(var ax=startX+8;ax<=cutterX;ax+=8)ctx.lineTo(ax,axisY(ax)+5+Math.sin(ax*.03)*2);ctx.stroke();
+
+        /* Risk zone is embedded ahead of the cutterhead. */
+        ctx.fillStyle='rgba(67,143,168,.24)';ctx.beginPath();ctx.moveTo(w*.79,h*.29);ctx.lineTo(w*.95,h*.31);ctx.lineTo(w*.96,h*.74);ctx.lineTo(w*.78,h*.72);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='rgba(106,190,216,.33)';ctx.lineWidth=1;for(var ht=0;ht<8;ht++){ctx.beginPath();ctx.moveTo(w*.78+ht*20,h*.72);ctx.lineTo(w*.82+ht*20,h*.3);ctx.stroke();}
+        ctx.fillStyle='rgba(9,15,17,.78)';ctx.fillRect(w*.51,h*.24,w*.17,22);ctx.fillStyle='#dce5e3';ctx.font='600 10px sans-serif';ctx.textAlign='left';ctx.fillText('掘进方向  →',w*.525,h*.24+15);
+        var riskX=w*.81,riskY=h*.3;ctx.fillStyle='rgba(255,200,87,.22)';ctx.beginPath();ctx.arc(riskX,riskY,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffc857';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('!',riskX,riskY+5);
+      }
+
+      function drawPressure(ctx,w,h){
+        ctx.clearRect(0,0,w,h);var p={l:3,r:3,t:5,b:5};var values=[2.78,2.80,2.79,2.83,2.84,2.81,2.82,2.86,2.84,2.82,2.83,2.82];
+        function px(i){return p.l+(w-p.l-p.r)*i/(values.length-1);}function py(v){return p.t+(h-p.t-p.b)*(3.15-v)/.65;}
+        ctx.fillStyle='rgba(41,167,255,.08)';ctx.fillRect(p.l,py(3.1),w-p.l-p.r,py(2.6)-py(3.1));
+        ctx.strokeStyle='rgba(255,77,94,.38)';ctx.lineWidth=1;[2.6,3.1].forEach(function(v){ctx.beginPath();ctx.moveTo(p.l,py(v));ctx.lineTo(w-p.r,py(v));ctx.stroke();});
+        ctx.strokeStyle='rgba(255,255,255,.65)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(p.l,py(2.85));ctx.lineTo(w-p.r,py(2.85));ctx.stroke();ctx.setLineDash([]);
+        ctx.strokeStyle='#29a7ff';ctx.lineWidth=2;ctx.beginPath();values.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
+        ctx.fillStyle='#29a7ff';ctx.beginPath();ctx.arc(px(values.length-1),py(values[values.length-1]),3,0,Math.PI*2);ctx.fill();
+      }
+
+      function drawTrend(ctx,w,h){
+        ctx.clearRect(0,0,w,h);var p={l:28,r:9,t:14,b:24};var attitude=[-6,-9,-8,-10,-6,-4,-2,0,1,1,5,7,8,8,6,8,9,10,10];var settlement=[-1.2,-1.5,-1.8,-2.4,-3.1,-3.8,-4.4,-4.8,-4.5,-4.2,-4.0,-3.8,-3.7,-3.6,-3.5,-3.4,-3.3,-3.2,-3.1];var data=state.trend==='attitude'?attitude:settlement;var min=state.trend==='attitude'?-15:-8,max=state.trend==='attitude'?15:1;
+        function px(i){return p.l+(w-p.l-p.r)*i/(data.length-1);}function py(v){return p.t+(h-p.t-p.b)*(max-v)/(max-min);}
+        ctx.strokeStyle='rgba(170,195,220,.15)';ctx.lineWidth=1;var ticks=state.trend==='attitude'?[-15,-10,-5,0,5,10,15]:[-8,-6,-4,-2,0];ctx.font='8px sans-serif';ctx.fillStyle='#6f7f8e';ctx.textAlign='right';ticks.forEach(function(t){ctx.beginPath();ctx.moveTo(p.l,py(t));ctx.lineTo(w-p.r,py(t));ctx.stroke();ctx.fillText(t,p.l-5,py(t)+3);});
+        if(state.trend==='attitude'){
+          ctx.fillStyle='rgba(83,116,204,.32)';ctx.beginPath();ctx.moveTo(px(0),py(0));data.forEach(function(v,i){ctx.lineTo(px(i),py(v));});ctx.lineTo(px(data.length-1),py(0));ctx.closePath();ctx.fill();
+          ctx.strokeStyle='#7898ed';ctx.lineWidth=2;ctx.beginPath();data.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
+          ctx.strokeStyle='rgba(210,220,230,.55)';ctx.setLineDash([3,3]);[-12,12].forEach(function(v){ctx.beginPath();ctx.moveTo(p.l,py(v));ctx.lineTo(w-p.r,py(v));ctx.stroke();});ctx.setLineDash([]);
+          data.forEach(function(v,i){var x=px(i),y=py(v),pred=i>15;ctx.fillStyle=pred?'#6f88c8':'#79b83f';ctx.beginPath();ctx.moveTo(x-6,y-4);ctx.lineTo(x+2,y-4);ctx.lineTo(x+2,y-8);ctx.lineTo(x+8,y);ctx.lineTo(x+2,y+8);ctx.lineTo(x+2,y+4);ctx.lineTo(x-6,y+4);ctx.closePath();ctx.fill();});
+        }else{
+          ctx.fillStyle='rgba(41,167,255,.12)';ctx.beginPath();data.forEach(function(v,i){var y=py(v+1.1);if(i===0)ctx.moveTo(px(i),y);else ctx.lineTo(px(i),y);});for(var i=data.length-1;i>=0;i--)ctx.lineTo(px(i),py(data[i]-1.1));ctx.closePath();ctx.fill();
+          ctx.strokeStyle='#29a7ff';ctx.lineWidth=2;ctx.beginPath();data.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
+          ctx.strokeStyle='rgba(255,255,255,.48)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(p.l,py(-5));ctx.lineTo(w-p.r,py(-5));ctx.stroke();ctx.setLineDash([]);
+        }
+        ctx.fillStyle='#70808f';ctx.font='8px sans-serif';ctx.textAlign='center';for(var label=0;label<data.length;label+=3)ctx.fillText(String(338+label),px(label),h-7);
+        ctx.fillStyle='#98a7b4';ctx.textAlign='left';ctx.fillText(state.trend==='attitude'?'轴线变化值 / mm':'沉降值 / mm',p.l,9);
       }
 
       function redraw() {
         resizeCanvas($('#tunnelCanvas'), drawTunnel);
         resizeCanvas($('#trendCanvas'), drawTrend);
+        resizeCanvas($('#pressureCanvas'), drawPressure);
       }
       window.addEventListener('resize', redraw); setTimeout(redraw, 20);
 
@@ -639,7 +1136,9 @@
       function applyMode(mode) {
         state.mode = mode; document.body.classList.toggle('manual', mode === 'manual');
         $$('.mode-option').forEach(function(btn){ var active=btn.dataset.mode===mode; btn.classList.toggle('active',active); btn.textContent=(active?'◉ ':'◯ ')+(btn.dataset.mode==='auto'?'自动':'人工'); });
-        $('#goalStatusText').textContent = mode === 'auto' ? '● 自动执行中' : '✋ 人工控制中';
+        $('#goalStatusText').textContent = mode === 'auto' ? '自动执行中' : '人工控制中';
+        $('#attitudeModeTag').textContent = mode === 'auto' ? '自动控制' : '人工控制';
+        $('.pressure-head .tag').textContent = mode === 'auto' ? '自动控制' : '人工控制';
         $('#subtitle').textContent = mode === 'auto' ? '已恢复自动驾驶，安全互锁正常，控制目标已同步。' : '已切换人工控制。Karl 将继续监控安全边界并记录本次接管。';
         addMessage('karl', mode === 'auto' ? '自动驾驶已恢复。我已完成策略自检，将持续监控姿态收敛。' : '人工控制已接管。接管原因为“' + state.selectedReason + '”。我会继续监控安全边界。');
         toast(mode==='auto'?'自动驾驶已恢复':'人工控制已接管', mode==='auto'?'策略 A-17 正在执行':'接管事件已写入学习样本', mode==='auto'?'✓':'✋'); redraw();
@@ -652,13 +1151,20 @@
         toast('速度上限已暂存','MAX ' + next + ' mm/min · 点击 Karl 可确认下发','↕');
       }
       $('#speedDown').addEventListener('click',function(){speedChange(-1);}); $('#speedUp').addEventListener('click',function(){speedChange(1);});
+      $$('.range-adjust').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          var row=btn.closest('.core-param');var step=Number(btn.dataset.step);var high=Number(row.dataset.high)+step;var low=Number(row.dataset.low);var decimals=Math.abs(step)<1?1:0;
+          high=Math.max(low+Math.abs(step),high);row.dataset.high=high.toFixed(decimals);row.querySelector('.range-high').textContent=high.toFixed(decimals);
+          toast('允许区间已暂存',row.querySelector('.parameter-name').textContent+'：'+low.toFixed(decimals)+'—'+high.toFixed(decimals),'↕');
+        });
+      });
 
       function showGroutConfirm() {
         openModal('<div class="modal-head"><div><div class="modal-kicker">Karl · 指令复述确认</div><div class="modal-title">修改本环同步注浆目标</div><div class="modal-copy">我理解为：仅将第 356 环注浆量目标提高到 7.0 m³，其余环不变。请确认后下发。</div></div><button class="close-button">×</button></div><div class="comparison"><div class="compare-box"><div class="compare-label">当前目标</div><div class="compare-value">6.5 m³</div></div><div class="compare-arrow">→</div><div class="compare-box new"><div class="compare-label">新目标</div><div class="compare-value">7.0 m³</div></div></div><div class="impact"><div class="impact-row"><span>安全边界检查</span><span>通过</span></div><div class="impact-row"><span>预计填充率</span><span>+4.8%</span></div><div class="impact-row"><span>地层沉降风险</span><span>低</span></div></div><div class="modal-actions"><button class="action-button ghost" id="cancelGrout">取消</button><button class="action-button primary" id="confirmGrout">确认并下发</button></div>');
         $('#cancelGrout').addEventListener('click',closeModal); $('#confirmGrout').addEventListener('click',applyGrout);
       }
       function applyGrout(){
-        closeModal(); $('#groutTarget').textContent='7.0'; $('#goalGrout').textContent='7.0'; $('#groutGoalLabel').textContent='目标 7.0'; $('#groutParameter').style.background='rgba(255,138,61,.08)'; $('#groutGoalItem').classList.add('intervened'); $('#groutGoalItem .goal-label').textContent='✋ 同步注浆';
+        closeModal(); $('#groutTarget').textContent='7.0'; $('#goalGrout').textContent='7.0'; $('#groutGoalLabel').textContent='目标完成 60% · 人工修改'; $('#groutParameter').style.background='rgba(255,138,61,.08)'; $('#groutFill').style.width='60%';
         addMessage('karl','指令已通过安全审核并下发：第 356 环同步注浆目标 7.0 m³。执行结果将持续回报。'); $('#subtitle').textContent='指令已下发：第 356 环同步注浆目标调整为 7.0 立方米。'; toast('参数已成功下发','本环同步注浆目标：7.0 m³','✓');
       }
 
@@ -706,10 +1212,8 @@
         var name=btn.dataset.dock;
         if(name==='报警中心'){showAlarm();return;}
         var content={
-          '工序管理':'当前工序：掘进中 · 下一步：同步注浆完成检查。第 356 环总体进度 72%。',
-          '生产报表':'今日累计掘进 8.4 m，完成 7 环；平均推速 22.6 mm/min，设备利用率 91%。',
-          '智能诊断':'系统检测到 1 项需观察：刀盘扭矩负载 81%；其他关键系统运行正常。',
-          '知识库':'可检索操作规程、故障案例、地层处置方案和历史班组经验。',
+          '生产数据':'今日累计掘进 8.4 m，完成 7 环；可查看实时参数、环报与班次统计。',
+          '工程资料':'可检索地质勘察、线路设计、施工组织、操作规程和历史案例。',
           '交接班':'当前班次 08:00—16:00，待交接事项 3 项，重要报警均已确认。'
         };
         openModal('<div class="modal-head"><div><div class="modal-kicker">功能中心</div><div class="modal-title">'+name+'</div><div class="modal-copy">'+content[name]+'</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>数据更新时间</span><span>刚刚</span></div><div class="impact-row"><span>系统状态</span><span>在线</span></div></div><div class="modal-actions"><button class="action-button primary" id="dockClose">完成</button></div>');$('#dockClose').addEventListener('click',closeModal);

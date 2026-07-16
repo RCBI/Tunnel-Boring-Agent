@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Karl · 盾构智能驾驶舱</title>
+  <meta name="description" content="Karl 盾构人机协作触摸屏交互原型">
+  <style>
+    :root {
+      --bg: #070b11;
+      --panel: #0d131c;
+      --panel-2: #111a25;
+      --line: rgba(170, 195, 220, .13);
+      --line-strong: rgba(170, 195, 220, .24);
+      --text: #eef5fb;
+      --muted: #8494a6;
+      --blue: #29a7ff;
+      --blue-2: #1673d1;
+      --blue-soft: rgba(41, 167, 255, .12);
+      --green: #4dd8a0;
+      --amber: #ffc857;
+      --orange: #ff8a3d;
+      --red: #ff4d5e;
+      --radius: 18px;
+      --mode: var(--blue);
+      --mode-soft: var(--blue-soft);
+      font-family: Inter, "DIN Alternate", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); }
+    body { overflow: hidden; }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--mode); outline-offset: 2px; }
+
+    .app {
+      min-height: 100vh;
+      height: 100dvh;
+      display: grid;
+      grid-template-rows: 66px minmax(0, 1fr) 76px;
+      background:
+        radial-gradient(circle at 62% 18%, rgba(36, 108, 175, .11), transparent 32%),
+        linear-gradient(180deg, #080d14, #06090e);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(290px, .9fr) minmax(350px, 1.25fr) minmax(280px, .9fr);
+      align-items: center;
+      gap: 20px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 11, 17, .92);
+      backdrop-filter: blur(18px);
+      z-index: 20;
+    }
+
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .brand-mark {
+      width: 36px; height: 36px; border-radius: 12px;
+      display: grid; place-items: center;
+      border: 1px solid color-mix(in srgb, var(--mode) 50%, transparent);
+      background: var(--mode-soft); color: var(--mode);
+      font-weight: 800; letter-spacing: -.04em;
+      box-shadow: inset 0 0 22px rgba(41, 167, 255, .08);
+    }
+    .brand-title { font-size: 15px; font-weight: 700; letter-spacing: .08em; }
+    .brand-sub { color: var(--muted); font-size: 11px; margin-top: 2px; letter-spacing: .08em; }
+
+    .run-meta { display: flex; align-items: center; justify-content: center; gap: 22px; }
+    .meta-block { display: flex; flex-direction: column; gap: 3px; min-width: 74px; }
+    .meta-label { color: var(--muted); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    .meta-value { font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); display: inline-block; margin-right: 7px; }
+
+    .top-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+    .mode-switch {
+      min-height: 44px; padding: 5px; border-radius: 14px;
+      border: 1px solid var(--line-strong); background: #0a1018;
+      display: flex; gap: 4px;
+    }
+    .mode-option {
+      border: 0; border-radius: 10px; min-width: 72px; padding: 0 13px;
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 700;
+    }
+    .mode-option.active { background: var(--mode-soft); color: var(--mode); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mode) 35%, transparent); }
+    .icon-button {
+      width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 14px;
+      background: #0b1119; display: grid; place-items: center; cursor: pointer;
+      color: #9eacbb; font-size: 19px;
+    }
+    .icon-button:hover { background: #111a24; color: #fff; }
+
+    .main {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(330px, 39%) minmax(0, 61%);
+    }
+    .column { min-height: 0; padding: 18px; display: grid; gap: 14px; overflow: hidden; }
+    .left-column { grid-template-rows: auto minmax(160px, .72fr) minmax(225px, 1fr); border-right: 1px solid var(--line); }
+    .right-column { grid-template-rows: minmax(245px, 1.15fr) minmax(155px, .68fr) auto; }
+
+    .section-head { display: flex; align-items: center; justify-content: space-between; min-height: 20px; }
+    .eyebrow { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .live { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+    .live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 9px currentColor; margin-right: 7px; }
+
+    .card { border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(17, 26, 37, .86), rgba(10, 15, 23, .9)); overflow: hidden; }
+    .speed-card { min-height: 154px; display: grid; grid-template-columns: 1.15fr .85fr; align-items: stretch; border-color: color-mix(in srgb, var(--mode) 30%, var(--line)); }
+    .speed-primary { padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; }
+    .speed-label { display: flex; align-items: center; gap: 8px; color: #b7c3d0; font-size: 13px; }
+    .autopilot-glyph { color: var(--mode); font-size: 17px; }
+    .speed-reading { display: flex; align-items: baseline; gap: 10px; }
+    .speed-number { font-size: clamp(58px, 5.4vw, 86px); line-height: .9; font-weight: 320; letter-spacing: -.07em; font-variant-numeric: tabular-nums; }
+    .speed-unit { color: var(--muted); font-size: 14px; }
+    .speed-control { padding: 18px; border-left: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; }
+    .max-label { color: var(--muted); font-size: 10px; letter-spacing: .12em; text-align: center; }
+    .max-value { text-align: center; font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .stepper { display: grid; grid-template-columns: 48px 1fr 48px; gap: 6px; align-items: center; }
+    .stepper button { min-height: 48px; border: 1px solid var(--line-strong); background: rgba(255,255,255,.03); border-radius: 12px; font-size: 24px; cursor: pointer; }
+    .stepper button:active { transform: scale(.96); }
+    .stepper-line { height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--mode) 83%, rgba(255,255,255,.1) 83%); }
+
+    .telemetry-row { min-height: 0; display: grid; grid-template-columns: .92fr 1.08fr; gap: 14px; }
+    .attitude { padding: 17px; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+    .card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 700; }
+    .tag { font-size: 10px; color: var(--mode); padding: 4px 7px; border-radius: 7px; background: var(--mode-soft); border: 1px solid color-mix(in srgb, var(--mode) 25%, transparent); }
+    .attitude-content { min-height: 0; display: grid; grid-template-columns: minmax(105px, 1fr) .9fr; gap: 12px; align-items: center; }
+    .target {
+      width: min(13vw, 150px); aspect-ratio: 1; max-height: 136px; margin: auto; border-radius: 50%; position: relative;
+      border: 1px solid rgba(170, 195, 220, .24);
+      background: repeating-radial-gradient(circle, transparent 0 20px, rgba(170,195,220,.09) 21px 22px), linear-gradient(90deg, transparent 49.5%, rgba(170,195,220,.16) 50%, transparent 50.5%), linear-gradient(transparent 49.5%, rgba(170,195,220,.16) 50%, transparent 50.5%);
+    }
+    .target-dot { position: absolute; left: calc(50% + 14px); top: calc(50% + 9px); width: 14px; height: 14px; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px var(--mode-soft), 0 0 18px var(--mode); }
+    .axis-label { position: absolute; color: var(--muted); font-size: 9px; }
+    .axis-label.top { top: 7px; left: 50%; transform: translateX(-50%); }
+    .axis-label.right { right: 8px; top: 50%; transform: translateY(-50%); }
+    .attitude-values { display: grid; gap: 13px; }
+    .metric-label { color: var(--muted); font-size: 10px; margin-bottom: 4px; }
+    .metric-value { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .metric-value small { color: var(--muted); font-size: 11px; margin-left: 4px; }
+    .metric-value .arrow { color: var(--mode); margin-left: 6px; }
+
+    .parameters { padding: 16px; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; }
+    .parameter-list { min-height: 0; display: grid; gap: 9px; }
+    .parameter { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(120px, 1.35fr); gap: 12px; align-items: center; padding: 7px 9px; border-radius: 11px; background: rgba(255,255,255,.018); transition: .25s; }
+    .parameter:hover { background: rgba(255,255,255,.035); }
+    .parameter.warning { background: rgba(255, 200, 87, .07); animation: warningPulse 2s infinite; }
+    @keyframes warningPulse { 50% { box-shadow: inset 0 0 0 1px rgba(255,200,87,.25); } }
+    .parameter-name { color: #9babbc; font-size: 11px; }
+    .parameter-value { margin-top: 3px; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .bar-wrap { display: grid; gap: 5px; }
+    .bar-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; }
+    .bar { height: 7px; border-radius: 5px; background: rgba(255,255,255,.07); position: relative; overflow: visible; }
+    .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mode-2, var(--blue-2)), var(--mode)); box-shadow: 0 0 12px color-mix(in srgb, var(--mode) 35%, transparent); }
+    .safe-line { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--red); box-shadow: 0 0 7px var(--red); }
+    .mini-spark { height: 13px; display: flex; align-items: end; gap: 3px; }
+    .mini-spark i { width: 4px; border-radius: 2px 2px 0 0; background: rgba(148,172,196,.36); }
+
+    .tunnel-card { min-height: 0; position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #0c131c; }
+    .canvas-wrap { position: absolute; inset: 0; }
+    canvas { width: 100%; height: 100%; display: block; }
+    .tunnel-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; }
+    .tunnel-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .view-title { font-size: 12px; font-weight: 750; letter-spacing: .08em; }
+    .view-sub { color: var(--muted); font-size: 10px; margin-top: 5px; }
+    .risk-pill { display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,200,87,.3); background: rgba(15,19,24,.72); border-radius: 10px; padding: 8px 11px; color: var(--amber); font-size: 10px; backdrop-filter: blur(8px); }
+    .tunnel-legend { display: flex; gap: 16px; align-items: center; color: #a9b6c4; font-size: 9px; }
+    .legend-item::before { content: ""; display: inline-block; width: 16px; height: 2px; border-radius: 2px; background: currentColor; vertical-align: middle; margin-right: 6px; }
+    .legend-item.design { color: var(--blue); }
+    .legend-item.actual { color: #fff; }
+    .legend-item.ring { color: var(--green); }
+
+    .intel-row { min-height: 0; display: grid; grid-template-columns: 1.08fr .92fr; gap: 14px; }
+    .goal-card, .trend-card { padding: 16px 18px; min-height: 0; }
+    .goal-card { border-color: color-mix(in srgb, var(--mode) 24%, var(--line)); }
+    .goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .progress-ring { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 9px; font-weight: 700; background: conic-gradient(var(--mode) 0 72%, rgba(255,255,255,.08) 72%); position: relative; }
+    .progress-ring::before { content: ""; position: absolute; inset: 4px; background: var(--panel); border-radius: 50%; }
+    .progress-ring span { position: relative; }
+    .goal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .goal-item { padding: 10px; border-radius: 11px; border: 1px solid var(--line); background: rgba(255,255,255,.018); min-width: 0; }
+    .goal-item.intervened { border-color: rgba(255,138,61,.34); background: rgba(255,138,61,.07); }
+    .goal-label { color: var(--muted); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .goal-value { font-size: 16px; margin-top: 6px; font-weight: 650; white-space: nowrap; }
+    .goal-value small { color: var(--muted); font-size: 9px; font-weight: 500; }
+    .goal-status { margin-top: 10px; color: var(--green); font-size: 10px; display: flex; justify-content: space-between; }
+
+    .trend-head { display: flex; align-items: center; justify-content: space-between; }
+    .tabs { display: flex; gap: 3px; padding: 3px; border-radius: 9px; background: rgba(255,255,255,.03); }
+    .tab { border: 0; border-radius: 7px; background: transparent; color: var(--muted); min-height: 27px; padding: 0 8px; font-size: 9px; cursor: pointer; }
+    .tab.active { color: #fff; background: rgba(255,255,255,.08); }
+    .trend-canvas { height: calc(100% - 34px); min-height: 82px; margin-top: 8px; }
+
+    .dock { min-height: 58px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .dock-button { min-height: 58px; border: 1px solid var(--line); background: rgba(13,20,29,.72); border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: #96a6b6; font-size: 11px; position: relative; }
+    .dock-button:hover { background: #131d28; color: #fff; border-color: var(--line-strong); }
+    .dock-icon { font-size: 16px; }
+    .badge { position: absolute; top: 7px; right: 8px; min-width: 17px; height: 17px; padding: 0 4px; display: grid; place-items: center; border-radius: 9px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; box-shadow: 0 0 10px rgba(255,77,94,.45); }
+
+    .bottombar { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 12px; padding: 10px 22px 10px 18px; border-top: 1px solid var(--line); background: rgba(7,11,17,.95); z-index: 30; }
+    .orb-home { position: relative; height: 56px; }
+    .karl-orb { width: 58px; height: 58px; border-radius: 50%; border: 1px solid rgba(41,167,255,.55); background: radial-gradient(circle at 35% 30%, #45beff, #1270bf 42%, #071b31 70%); box-shadow: 0 0 0 7px rgba(41,167,255,.06), 0 0 30px rgba(41,167,255,.35), inset -9px -12px 22px rgba(0,0,0,.3); cursor: grab; display: grid; place-items: center; position: fixed; left: 20px; bottom: 10px; z-index: 80; user-select: none; touch-action: none; transition: box-shadow .25s, border-color .25s; }
+    .karl-orb::before { content: "K"; font-size: 23px; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+    .karl-orb::after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(41,167,255,.25); border-radius: 50%; animation: breathe 2.6s ease-in-out infinite; }
+    @keyframes breathe { 50% { transform: scale(1.09); opacity: .25; } }
+    .karl-orb.listening::after { animation: listen 1s ease-out infinite; border-width: 2px; }
+    @keyframes listen { from { transform: scale(.9); opacity: 1; } to { transform: scale(1.55); opacity: 0; } }
+    .karl-orb.thinking::before { content: "◌"; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .karl-orb.alert { background: radial-gradient(circle at 35% 30%, #ff7782, #c62035 50%, #310912 75%); border-color: var(--red); box-shadow: 0 0 0 7px rgba(255,77,94,.08), 0 0 34px rgba(255,77,94,.6); }
+    .karl-orb.alert::after { border-color: var(--red); animation: listen .7s ease-out infinite; }
+
+    .subtitle-bar { min-width: 0; height: 52px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: 15px; padding: 0 15px; background: #0c121a; cursor: pointer; }
+    .karl-label { color: var(--mode); font-weight: 800; font-size: 11px; letter-spacing: .09em; }
+    .subtitle { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; color: #d9e2eb; }
+    .history-hint { color: var(--muted); font-size: 10px; }
+    .voice-actions { display: flex; gap: 8px; }
+    .voice-button { min-width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 15px; background: #0c121a; cursor: pointer; font-size: 19px; }
+    .voice-button.primary { background: var(--mode-soft); border-color: color-mix(in srgb, var(--mode) 30%, transparent); color: var(--mode); }
+
+    .alarm-banner { position: fixed; top: 66px; left: 0; right: 0; min-height: 64px; transform: translateY(-110%); opacity: 0; transition: .3s ease; z-index: 60; background: linear-gradient(90deg, #be172b, #ef3f51 45%, #be172b); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 10px 25px; box-shadow: 0 12px 35px rgba(255,0,42,.25); }
+    .alarm-banner.show { transform: translateY(0); opacity: 1; }
+    .alarm-icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(0,0,0,.17); display: grid; place-items: center; font-size: 21px; }
+    .alarm-title { font-weight: 800; font-size: 14px; }
+    .alarm-copy { font-size: 11px; opacity: .82; margin-top: 3px; }
+    .alarm-actions { display: flex; gap: 8px; }
+
+    .action-button { min-height: 44px; border-radius: 11px; padding: 0 17px; border: 1px solid var(--line-strong); background: rgba(255,255,255,.06); cursor: pointer; font-size: 12px; font-weight: 700; }
+    .action-button.primary { background: var(--mode); color: #03111c; border-color: var(--mode); }
+    .action-button.danger { background: #fff; color: #ba1c2f; border-color: #fff; }
+    .action-button.ghost { background: transparent; color: var(--muted); }
+
+    .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.56); backdrop-filter: blur(8px); z-index: 90; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .scrim.show { display: flex; }
+    .modal { width: min(540px, 94vw); max-height: 88vh; overflow: auto; border: 1px solid var(--line-strong); border-radius: 22px; background: #101720; box-shadow: 0 30px 80px rgba(0,0,0,.5); padding: 24px; }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .modal-kicker { color: var(--mode); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .modal-title { font-size: 22px; font-weight: 720; margin-top: 7px; }
+    .modal-copy { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 9px; }
+    .close-button { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 12px; background: transparent; cursor: pointer; color: var(--muted); font-size: 18px; }
+    .comparison { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin: 22px 0; }
+    .compare-box { border-radius: 15px; border: 1px solid var(--line); background: rgba(255,255,255,.025); padding: 16px; }
+    .compare-box.new { border-color: color-mix(in srgb, var(--mode) 38%, transparent); background: var(--mode-soft); }
+    .compare-label { color: var(--muted); font-size: 10px; }
+    .compare-value { font-size: 28px; font-weight: 650; margin-top: 6px; }
+    .compare-arrow { color: var(--mode); font-size: 22px; }
+    .impact { display: grid; gap: 8px; margin: 16px 0 22px; }
+    .impact-row { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.025); font-size: 11px; }
+    .impact-row span:last-child { color: var(--green); font-weight: 700; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+    .field-label { display: block; color: #aab6c3; font-size: 11px; margin: 17px 0 7px; }
+    .text-field { width: 100%; min-height: 48px; border: 1px solid var(--line-strong); border-radius: 12px; background: #0a1017; color: var(--text); padding: 12px; resize: vertical; }
+    .reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .reason-choice { min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.02); cursor: pointer; color: #b2bfcc; }
+    .reason-choice.selected { color: var(--orange); border-color: rgba(255,138,61,.5); background: rgba(255,138,61,.08); }
+
+    .drawer { position: fixed; right: 18px; bottom: 86px; width: min(410px, calc(100vw - 36px)); height: min(620px, calc(100vh - 170px)); z-index: 70; border: 1px solid var(--line-strong); border-radius: 22px; background: rgba(12,18,27,.97); box-shadow: 0 24px 80px rgba(0,0,0,.55); backdrop-filter: blur(18px); display: none; grid-template-rows: auto minmax(0,1fr) auto; overflow: hidden; }
+    .drawer.show { display: grid; animation: drawerIn .25s ease-out; }
+    @keyframes drawerIn { from { opacity: 0; transform: translateY(15px) scale(.98); } }
+    .drawer-head { padding: 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .assistant-id { display: flex; align-items: center; gap: 11px; }
+    .assistant-mini { width: 35px; height: 35px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #45beff, #1270bf 50%, #071b31); font-weight: 800; }
+    .assistant-name { font-weight: 750; font-size: 14px; }
+    .assistant-state { color: var(--green); font-size: 10px; margin-top: 2px; }
+    .messages { min-height: 0; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; }
+    .message { max-width: 86%; padding: 11px 13px; border-radius: 14px; font-size: 12px; line-height: 1.55; }
+    .message.karl { align-self: flex-start; border: 1px solid var(--line); background: rgba(255,255,255,.035); border-bottom-left-radius: 5px; }
+    .message.user { align-self: flex-end; background: var(--mode-soft); color: #dceeff; border: 1px solid color-mix(in srgb, var(--mode) 25%, transparent); border-bottom-right-radius: 5px; }
+    .message-time { color: var(--muted); font-size: 9px; margin-top: 5px; }
+    .quick-prompts { display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 10px; scrollbar-width: none; }
+    .prompt-chip { flex: 0 0 auto; min-height: 34px; border: 1px solid var(--line); background: rgba(255,255,255,.025); border-radius: 17px; padding: 0 11px; color: #aebac6; font-size: 10px; cursor: pointer; }
+    .composer-wrap { border-top: 1px solid var(--line); padding: 11px 13px 13px; }
+    .composer { display: grid; grid-template-columns: 1fr 44px; gap: 7px; }
+    .composer input { min-width: 0; height: 44px; border: 1px solid var(--line); border-radius: 12px; background: #080d13; color: #fff; padding: 0 12px; }
+    .send-button { border: 0; border-radius: 12px; background: var(--mode); color: #03111c; font-weight: 900; cursor: pointer; }
+
+    .toast-stack { position: fixed; top: 82px; right: 18px; z-index: 100; display: grid; gap: 9px; }
+    .toast { width: min(350px, calc(100vw - 36px)); border: 1px solid var(--line-strong); border-radius: 14px; background: #121a24; box-shadow: 0 15px 35px rgba(0,0,0,.35); padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; animation: toastIn .3s ease-out; }
+    @keyframes toastIn { from { transform: translateX(20px); opacity: 0; } }
+    .toast-icon { color: var(--green); }
+    .toast-title { font-size: 12px; font-weight: 700; }
+    .toast-copy { margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+    body.manual { --mode: var(--orange); --mode-soft: rgba(255, 138, 61, .12); }
+    body.manual .brand-mark { box-shadow: inset 0 0 22px rgba(255,138,61,.08); }
+    body.manual .goal-status { color: var(--orange); }
+
+    @media (max-width: 1100px) {
+      .topbar { grid-template-columns: 1fr auto; }
+      .run-meta { display: none; }
+      .main { grid-template-columns: 43% 57%; }
+      .goal-grid { grid-template-columns: 1fr 1fr; }
+      .dock-button { flex-direction: column; gap: 2px; }
+      .left-column { padding-right: 12px; }
+      .right-column { padding-left: 12px; }
+      .speed-card { grid-template-columns: 1fr .7fr; }
+    }
+
+    @media (max-width: 820px), (max-height: 660px) {
+      body { overflow: auto; }
+      .app { height: auto; min-height: 100vh; grid-template-rows: 62px auto 74px; }
+      .topbar { position: sticky; top: 0; grid-template-columns: 1fr auto; padding: 0 12px; }
+      .brand-sub, .icon-button { display: none; }
+      .mode-option { min-width: 60px; }
+      .main { display: block; }
+      .column { overflow: visible; padding: 12px; }
+      .left-column, .right-column { border: 0; grid-template-rows: auto; }
+      .speed-card { min-height: 170px; }
+      .telemetry-row, .intel-row { grid-template-columns: 1fr; }
+      .attitude, .parameters, .goal-card, .trend-card { min-height: 240px; }
+      .tunnel-card { height: 360px; }
+      .dock { grid-template-columns: repeat(3, 1fr); }
+      .bottombar { position: sticky; bottom: 0; padding: 9px 10px; grid-template-columns: 65px 1fr auto; }
+      .history-hint, .karl-label { display: none; }
+      .subtitle-bar { grid-template-columns: 1fr; }
+      .voice-button:not(.primary) { display: none; }
+      .karl-orb { left: 13px; bottom: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">K</div>
+        <div>
+          <div class="brand-title">KARL · 盾构智能驾驶舱</div>
+          <div class="brand-sub">HUMAN–MACHINE COLLABORATION SYSTEM</div>
+        </div>
+      </div>
+
+      <div class="run-meta" aria-label="运行信息">
+        <div class="meta-block"><span class="meta-label">当前环号</span><span class="meta-value">RING 356</span></div>
+        <div class="meta-block"><span class="meta-label">里程</span><span class="meta-value">K12+345.8</span></div>
+        <div class="meta-block"><span class="meta-label">系统时间</span><span class="meta-value" id="clock">14:26:08</span></div>
+        <div class="meta-block"><span class="meta-label">链路状态</span><span class="meta-value"><i class="status-dot"></i>正常</span></div>
+      </div>
+
+      <div class="top-actions">
+        <div class="mode-switch" role="group" aria-label="驾驶模式">
+          <button class="mode-option active" data-mode="auto">◉ 自动</button>
+          <button class="mode-option" data-mode="manual">◯ 人工</button>
+        </div>
+        <button class="icon-button" id="settingsBtn" aria-label="系统设置">⚙</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="column left-column" aria-label="掘进实况">
+        <div class="section-head"><span class="eyebrow">掘进实况 · Live drive</span><span class="live">数据实时</span></div>
+
+        <article class="card speed-card">
+          <div class="speed-primary">
+            <div class="speed-label"><span class="autopilot-glyph">◉</span>推进速度</div>
+            <div class="speed-reading"><strong class="speed-number" id="speedValue">23</strong><span class="speed-unit">mm/min</span></div>
+          </div>
+          <div class="speed-control">
+            <div class="max-label">速度上限 · MAX</div>
+            <div class="max-value" id="maxSpeed">30</div>
+            <div class="stepper">
+              <button id="speedDown" aria-label="降低速度上限">−</button>
+              <div class="stepper-line"></div>
+              <button id="speedUp" aria-label="提高速度上限">＋</button>
+            </div>
+          </div>
+        </article>
+
+        <div class="telemetry-row">
+          <article class="card attitude">
+            <div class="card-title"><span>姿态仪表</span><span class="tag">自动纠偏</span></div>
+            <div class="attitude-content">
+              <div class="target" aria-label="盾构姿态十字靶图">
+                <span class="axis-label top">高程</span><span class="axis-label right">水平</span><i class="target-dot"></i>
+              </div>
+              <div class="attitude-values">
+                <div><div class="metric-label">水平偏差</div><div class="metric-value">+12<small>mm</small><span class="arrow">→</span></div></div>
+                <div><div class="metric-label">高程偏差</div><div class="metric-value">−8<small>mm</small><span class="arrow">↓</span></div></div>
+                <div><div class="metric-label">滚动 / 俯仰</div><div class="metric-value">0.3°<small>/ −0.1°</small></div></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card parameters">
+            <div class="card-title"><span>关键参数与安全边界</span><span class="tag">4 项正常</span></div>
+            <div class="parameter-list">
+              <div class="parameter">
+                <div><div class="parameter-name">切口压力</div><div class="parameter-value">2.82 bar</div></div>
+                <div class="bar-wrap"><div class="bar-meta"><span>2.60</span><span>目标 2.85</span><span>3.10</span></div><div class="bar"><div class="bar-fill" style="width: 62%"></div><i class="safe-line" style="left: 92%"></i></div><div class="mini-spark"><i style="height:35%"></i><i style="height:54%"></i><i style="height:43%"></i><i style="height:72%"></i><i style="height:60%"></i><i style="height:68%"></i></div></div>
+              </div>
+              <div class="parameter">
+                <div><div class="parameter-name">总推力</div><div class="parameter-value">32.6 MN</div></div>
+                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span>目标 34.0</span><span>45</span></div><div class="bar"><div class="bar-fill" style="width:72%"></div><i class="safe-line" style="left:94%"></i></div><div class="mini-spark"><i style="height:45%"></i><i style="height:64%"></i><i style="height:51%"></i><i style="height:60%"></i><i style="height:75%"></i><i style="height:70%"></i></div></div>
+              </div>
+              <div class="parameter warning">
+                <div><div class="parameter-name">刀盘扭矩</div><div class="parameter-value">5.26 MN·m</div></div>
+                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span>负载 78%</span><span>6.5</span></div><div class="bar"><div class="bar-fill" style="width:81%; background:linear-gradient(90deg,#cc8a1a,var(--amber))"></div><i class="safe-line" style="left:90%"></i></div><div class="mini-spark"><i style="height:40%"></i><i style="height:54%"></i><i style="height:75%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:84%;background:var(--amber)"></i></div></div>
+              </div>
+              <div class="parameter" id="groutParameter">
+                <div><div class="parameter-name">同步注浆量</div><div class="parameter-value"><span id="groutValue">4.2</span> / <span id="groutTarget">6.5</span> m³</div></div>
+                <div class="bar-wrap"><div class="bar-meta"><span>0</span><span id="groutGoalLabel">目标 6.5</span><span>8.0</span></div><div class="bar"><div class="bar-fill" id="groutFill" style="width:64%"></div><i class="safe-line" style="left:94%"></i></div><div class="mini-spark"><i style="height:30%"></i><i style="height:44%"></i><i style="height:53%"></i><i style="height:61%"></i><i style="height:70%"></i><i style="height:76%"></i></div></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="column right-column" aria-label="环境与控制目标">
+        <article class="tunnel-card">
+          <div class="canvas-wrap"><canvas id="tunnelCanvas" aria-label="隧道纵断面与前方环境"></canvas></div>
+          <div class="tunnel-overlay">
+            <div class="tunnel-top">
+              <div><div class="view-title">前方环境 · 隧道纵断面</div><div class="view-sub">预测范围 0—60 m · 地层与邻近设施实时融合</div></div>
+              <div class="risk-pill">△ 前方 38 m · 富水砂层</div>
+            </div>
+            <div class="tunnel-legend"><span class="legend-item design">设计轴线</span><span class="legend-item actual">实际轨迹</span><span class="legend-item ring">已拼装环</span></div>
+          </div>
+        </article>
+
+        <div class="intel-row">
+          <article class="card goal-card" id="goalCard">
+            <div class="goal-header">
+              <div><div class="card-title">第 356 环 · 阶段控制目标</div><div class="view-sub">自动策略 A-17 · 粉质黏土夹砂层</div></div>
+              <div class="progress-ring"><span>72%</span></div>
+            </div>
+            <div class="goal-grid">
+              <div class="goal-item"><div class="goal-label">切口压力</div><div class="goal-value">2.85 <small>bar</small></div></div>
+              <div class="goal-item"><div class="goal-label">推速区间</div><div class="goal-value">20—26</div></div>
+              <div class="goal-item"><div class="goal-label">姿态纠偏</div><div class="goal-value">左 3 <small>mm</small></div></div>
+              <div class="goal-item" id="groutGoalItem"><div class="goal-label">同步注浆</div><div class="goal-value"><span id="goalGrout">6.5</span> <small>m³</small></div></div>
+            </div>
+            <div class="goal-status"><span id="goalStatusText">● 自动执行中</span><span>剩余推进 0.4 m</span></div>
+          </article>
+
+          <article class="card trend-card">
+            <div class="trend-head">
+              <div class="card-title">趋势预测</div>
+              <div class="tabs" role="tablist"><button class="tab active" data-trend="settlement">沉降</button><button class="tab" data-trend="attitude">姿态</button><button class="tab" data-trend="pressure">压力</button></div>
+            </div>
+            <div class="trend-canvas"><canvas id="trendCanvas" aria-label="历史和预测趋势图"></canvas></div>
+          </article>
+        </div>
+
+        <nav class="dock" aria-label="常用功能">
+          <button class="dock-button" data-dock="工序管理"><span class="dock-icon">▤</span><span>工序</span></button>
+          <button class="dock-button" data-dock="生产报表"><span class="dock-icon">▥</span><span>报表</span></button>
+          <button class="dock-button" data-dock="智能诊断"><span class="dock-icon">◇</span><span>诊断</span></button>
+          <button class="dock-button" data-dock="知识库"><span class="dock-icon">▧</span><span>知识库</span></button>
+          <button class="dock-button" data-dock="报警中心"><span class="dock-icon">△</span><span>报警</span><i class="badge">2</i></button>
+          <button class="dock-button" data-dock="交接班"><span class="dock-icon">◒</span><span>交接班</span></button>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="bottombar">
+      <div class="orb-home"><button class="karl-orb" id="karlOrb" aria-label="打开 Karl 助手"></button></div>
+      <div class="subtitle-bar" id="subtitleBar" title="点击查看对话记录">
+        <span class="karl-label">KARL 正在播报</span>
+        <span class="subtitle" id="subtitle">距本环结束还有 0.4 米，当前姿态收敛正常。刀盘扭矩接近预警阈值，请持续观察。</span>
+        <span class="history-hint">↑ 对话记录</span>
+      </div>
+      <div class="voice-actions"><button class="voice-button primary" id="micBtn" aria-label="语音唤醒 Karl">⌁</button><button class="voice-button" id="muteBtn" aria-label="静音">♬</button></div>
+    </footer>
+  </div>
+
+  <div class="alarm-banner" id="alarmBanner" role="alert">
+    <div class="alarm-icon">!</div>
+    <div><div class="alarm-title">刀盘扭矩持续升高 · 预警等级 II</div><div class="alarm-copy">当前 5.26 MN·m，已达到安全边界的 81%。建议降低推进速度并观察渣土状态。</div></div>
+    <div class="alarm-actions"><button class="action-button" id="alarmDetails">查看诊断</button><button class="action-button danger" id="ackAlarm">确认收到</button></div>
+  </div>
+
+  <aside class="drawer" id="karlDrawer" aria-label="Karl 对话面板">
+    <div class="drawer-head">
+      <div class="assistant-id"><div class="assistant-mini">K</div><div><div class="assistant-name">Karl</div><div class="assistant-state" id="assistantState">● 在线 · 等待指令</div></div></div>
+      <button class="close-button" id="closeDrawer" aria-label="关闭">×</button>
+    </div>
+    <div class="messages" id="messages">
+      <div class="message karl">下午好。我正在监控第 356 环。你可以调整控制目标、询问工况原因，或记录现场事件。<div class="message-time">14:25</div></div>
+      <div class="message karl">刀盘扭矩达到安全边界的 81%，暂未越线，建议持续观察。<div class="message-time">14:26</div></div>
+    </div>
+    <div>
+      <div class="quick-prompts"><button class="prompt-chip">这环注浆量加到7方</button><button class="prompt-chip">为什么转速降了？</button><button class="prompt-chip">尾部有渗漏</button><button class="prompt-chip">模拟报警</button></div>
+      <div class="composer-wrap"><div class="composer"><input id="commandInput" aria-label="输入指令" placeholder="输入或说出指令…"><button class="send-button" id="sendCommand" aria-label="发送">↑</button></div></div>
+    </div>
+  </aside>
+
+  <div class="scrim" id="modalScrim" role="presentation"><div class="modal" id="modalContent" role="dialog" aria-modal="true"></div></div>
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      var state = { mode: 'auto', maxSpeed: 30, trend: 'settlement', muted: false, alarmOpen: false, selectedReason: '' };
+      var $ = function (selector) { return document.querySelector(selector); };
+      var $$ = function (selector) { return Array.prototype.slice.call(document.querySelectorAll(selector)); };
+
+      function setClock() {
+        var now = new Date();
+        $('#clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
+      }
+      setClock();
+      setInterval(setClock, 1000);
+
+      function resizeCanvas(canvas, draw) {
+        var rect = canvas.getBoundingClientRect();
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.max(1, Math.round(rect.width * dpr));
+        canvas.height = Math.max(1, Math.round(rect.height * dpr));
+        var ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        draw(ctx, rect.width, rect.height);
+      }
+
+      function drawTunnel(ctx, w, h) {
+        ctx.clearRect(0, 0, w, h);
+        var bg = ctx.createLinearGradient(0, 0, 0, h);
+        bg.addColorStop(0, '#121d28'); bg.addColorStop(.5, '#0b141d'); bg.addColorStop(1, '#070c12');
+        ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+
+        var layers = [
+          { y: .22, amp: 9, c: 'rgba(95,112,102,.16)' },
+          { y: .38, amp: 14, c: 'rgba(133,108,74,.16)' },
+          { y: .56, amp: 12, c: 'rgba(80,91,105,.18)' },
+          { y: .72, amp: 10, c: 'rgba(107,87,68,.14)' }
+        ];
+        layers.forEach(function (layer, idx) {
+          ctx.beginPath(); ctx.moveTo(0, h * layer.y);
+          for (var x = 0; x <= w; x += 18) ctx.lineTo(x, h * layer.y + Math.sin(x * .018 + idx) * layer.amp);
+          ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fillStyle = layer.c; ctx.fill();
+        });
+
+        ctx.strokeStyle = 'rgba(150,177,201,.08)'; ctx.lineWidth = 1;
+        for (var gx = 0; gx < w; gx += 56) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
+        for (var gy = 0; gy < h; gy += 48) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
+
+        var horizon = h * .55;
+        ctx.fillStyle = 'rgba(4,8,12,.55)';
+        ctx.beginPath(); ctx.moveTo(w * .44, horizon); ctx.lineTo(w * .56, horizon); ctx.lineTo(w * .87, h); ctx.lineTo(w * .13, h); ctx.closePath(); ctx.fill();
+
+        ctx.strokeStyle = 'rgba(77,216,160,.32)'; ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.moveTo(w * .16, h); ctx.quadraticCurveTo(w * .32, h * .68, w * .46, horizon); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w * .84, h); ctx.quadraticCurveTo(w * .68, h * .68, w * .54, horizon); ctx.stroke();
+        for (var r = 0; r < 7; r++) {
+          var t = r / 7;
+          var yy = h - Math.pow(t, .65) * (h - horizon);
+          var half = (1 - t) * w * .34 + t * w * .05;
+          ctx.strokeStyle = 'rgba(77,216,160,' + (.22 + t * .18) + ')'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(w / 2 - half, yy); ctx.lineTo(w / 2 + half, yy); ctx.stroke();
+        }
+
+        ctx.setLineDash([8, 8]); ctx.strokeStyle = '#29a7ff'; ctx.lineWidth = 2.2; ctx.shadowColor = '#29a7ff'; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.moveTo(w * .49, h); ctx.bezierCurveTo(w * .48, h * .79, w * .51, h * .67, w * .5, horizon); ctx.stroke();
+        ctx.setLineDash([]); ctx.strokeStyle = '#f4f8fb'; ctx.lineWidth = 2; ctx.shadowColor = '#fff'; ctx.shadowBlur = 7;
+        ctx.beginPath(); ctx.moveTo(w * .52, h); ctx.bezierCurveTo(w * .53, h * .82, w * .49, h * .68, w * .505, horizon); ctx.stroke(); ctx.shadowBlur = 0;
+
+        var machineX = w * .5, machineY = h * .67;
+        ctx.save(); ctx.translate(machineX, machineY);
+        ctx.fillStyle = '#d5a62f'; ctx.strokeStyle = '#ffe293'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(0, 0, 31, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#553b0d'; ctx.beginPath(); ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#f1c95b'; for (var b = 0; b < 8; b++) { var a = b * Math.PI / 4; ctx.beginPath(); ctx.arc(Math.cos(a)*22, Math.sin(a)*12, 2.5, 0, Math.PI*2); ctx.fill(); }
+        ctx.restore();
+
+        var riskX = w * .67, riskY = h * .33;
+        ctx.fillStyle = 'rgba(255,200,87,.18)'; ctx.beginPath(); ctx.arc(riskX, riskY, 18, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ffc857'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('!', riskX, riskY + 6);
+        ctx.font = '10px sans-serif'; ctx.textAlign = 'left'; ctx.fillText('38m', riskX + 22, riskY + 4);
+      }
+
+      function drawTrend(ctx, w, h) {
+        ctx.clearRect(0, 0, w, h);
+        var pad = { l: 8, r: 8, t: 10, b: 18 };
+        ctx.strokeStyle = 'rgba(170,195,220,.1)'; ctx.lineWidth = 1;
+        for (var i = 0; i < 4; i++) { var y = pad.t + (h-pad.t-pad.b)*i/3; ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(w-pad.r,y); ctx.stroke(); }
+        var variants = {
+          settlement: [52,50,54,49,46,44,43,41,39,38],
+          attitude: [45,57,51,55,48,46,44,42,41,40],
+          pressure: [54,49,51,47,52,50,49,48,46,45]
+        };
+        var data = variants[state.trend];
+        var usableW = w-pad.l-pad.r, usableH = h-pad.t-pad.b;
+        function px(idx) { return pad.l + usableW * idx/(data.length-1); }
+        function py(v) { return pad.t + usableH * v/100; }
+
+        ctx.beginPath();
+        for (var j=5;j<data.length;j++) { var upper=py(data[j]-9); if(j===5) ctx.moveTo(px(j),upper); else ctx.lineTo(px(j),upper); }
+        for (var k=data.length-1;k>=5;k--) ctx.lineTo(px(k),py(data[k]+10));
+        ctx.closePath(); ctx.fillStyle='rgba(41,167,255,.1)'; ctx.fill();
+
+        ctx.strokeStyle='#9aaaba'; ctx.lineWidth=2; ctx.setLineDash([]); ctx.beginPath();
+        data.slice(0,6).forEach(function(v,idx){ if(idx===0)ctx.moveTo(px(idx),py(v)); else ctx.lineTo(px(idx),py(v)); }); ctx.stroke();
+        ctx.strokeStyle='#29a7ff'; ctx.setLineDash([5,5]); ctx.beginPath();
+        data.slice(5).forEach(function(v,idx){ var real=idx+5; if(idx===0)ctx.moveTo(px(real),py(v)); else ctx.lineTo(px(real),py(v)); }); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle='#718294'; ctx.font='9px sans-serif'; ctx.textAlign='left'; ctx.fillText('历史',pad.l,h-4); ctx.textAlign='right'; ctx.fillText('预测 +5环',w-pad.r,h-4);
+      }
+
+      function redraw() {
+        resizeCanvas($('#tunnelCanvas'), drawTunnel);
+        resizeCanvas($('#trendCanvas'), drawTrend);
+      }
+      window.addEventListener('resize', redraw); setTimeout(redraw, 20);
+
+      function toast(title, copy, icon) {
+        var el = document.createElement('div'); el.className = 'toast';
+        el.innerHTML = '<div class="toast-icon">' + (icon || '✓') + '</div><div><div class="toast-title">' + title + '</div><div class="toast-copy">' + copy + '</div></div>';
+        $('#toastStack').appendChild(el); setTimeout(function(){ el.remove(); }, 3600);
+      }
+
+      function openModal(html) {
+        $('#modalContent').innerHTML = html;
+        $('#modalScrim').classList.add('show');
+        var close = $('#modalContent .close-button'); if (close) close.addEventListener('click', closeModal);
+      }
+      function closeModal() { $('#modalScrim').classList.remove('show'); }
+      $('#modalScrim').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeModal(); $('#karlDrawer').classList.remove('show'); } });
+
+      function requestMode(nextMode) {
+        if (nextMode === state.mode) return;
+        var toManual = nextMode === 'manual';
+        var html = '<div class="modal-head"><div><div class="modal-kicker">安全确认 · 模式切换</div><div class="modal-title">' + (toManual ? '切换至人工控制？' : '恢复自动驾驶？') + '</div><div class="modal-copy">模式切换将记录到运行日志，并由 Karl 持续追踪切换后的参数变化。</div></div><button class="close-button">×</button></div>';
+        if (toManual) html += '<label class="field-label">请选择本次接管原因</label><div class="reason-grid"><button class="reason-choice">地质条件变化</button><button class="reason-choice">设备状态异常</button><button class="reason-choice">现场特殊操作</button><button class="reason-choice">策略效果不佳</button></div><label class="field-label">补充说明（可选）</label><textarea class="text-field" id="reasonText" rows="2" placeholder="可通过语音补充接管原因"></textarea>';
+        else html += '<div class="impact"><div class="impact-row"><span>自动策略自检</span><span>已通过</span></div><div class="impact-row"><span>控制目标一致性</span><span>已同步</span></div><div class="impact-row"><span>安全互锁</span><span>正常</span></div></div>';
+        html += '<div class="modal-actions"><button class="action-button ghost" id="cancelMode">取消</button><button class="action-button primary" id="confirmMode">' + (toManual ? '确认接管' : '确认恢复自动') + '</button></div>';
+        openModal(html);
+        $$('.reason-choice').forEach(function(btn){ btn.addEventListener('click', function(){ $$('.reason-choice').forEach(function(b){b.classList.remove('selected');}); btn.classList.add('selected'); state.selectedReason=btn.textContent; }); });
+        $('#cancelMode').addEventListener('click', closeModal);
+        $('#confirmMode').addEventListener('click', function(){
+          if(toManual && !state.selectedReason){ toast('请选择接管原因','该信息将用于后续策略学习与复盘','!'); return; }
+          applyMode(nextMode); closeModal();
+        });
+      }
+
+      function applyMode(mode) {
+        state.mode = mode; document.body.classList.toggle('manual', mode === 'manual');
+        $$('.mode-option').forEach(function(btn){ var active=btn.dataset.mode===mode; btn.classList.toggle('active',active); btn.textContent=(active?'◉ ':'◯ ')+(btn.dataset.mode==='auto'?'自动':'人工'); });
+        $('#goalStatusText').textContent = mode === 'auto' ? '● 自动执行中' : '✋ 人工控制中';
+        $('#subtitle').textContent = mode === 'auto' ? '已恢复自动驾驶，安全互锁正常，控制目标已同步。' : '已切换人工控制。Karl 将继续监控安全边界并记录本次接管。';
+        addMessage('karl', mode === 'auto' ? '自动驾驶已恢复。我已完成策略自检，将持续监控姿态收敛。' : '人工控制已接管。接管原因为“' + state.selectedReason + '”。我会继续监控安全边界。');
+        toast(mode==='auto'?'自动驾驶已恢复':'人工控制已接管', mode==='auto'?'策略 A-17 正在执行':'接管事件已写入学习样本', mode==='auto'?'✓':'✋'); redraw();
+      }
+      $$('.mode-option').forEach(function(btn){ btn.addEventListener('click', function(){ requestMode(btn.dataset.mode); }); });
+
+      function speedChange(delta) {
+        var next = Math.max(15, Math.min(35, state.maxSpeed + delta)); if(next===state.maxSpeed) return; state.maxSpeed=next; $('#maxSpeed').textContent=next;
+        $('#maxSpeed').animate([{opacity:.2,transform:'scale(1.18)'},{opacity:1,transform:'scale(1)'}],{duration:260});
+        toast('速度上限已暂存','MAX ' + next + ' mm/min · 点击 Karl 可确认下发','↕');
+      }
+      $('#speedDown').addEventListener('click',function(){speedChange(-1);}); $('#speedUp').addEventListener('click',function(){speedChange(1);});
+
+      function showGroutConfirm() {
+        openModal('<div class="modal-head"><div><div class="modal-kicker">Karl · 指令复述确认</div><div class="modal-title">修改本环同步注浆目标</div><div class="modal-copy">我理解为：仅将第 356 环注浆量目标提高到 7.0 m³，其余环不变。请确认后下发。</div></div><button class="close-button">×</button></div><div class="comparison"><div class="compare-box"><div class="compare-label">当前目标</div><div class="compare-value">6.5 m³</div></div><div class="compare-arrow">→</div><div class="compare-box new"><div class="compare-label">新目标</div><div class="compare-value">7.0 m³</div></div></div><div class="impact"><div class="impact-row"><span>安全边界检查</span><span>通过</span></div><div class="impact-row"><span>预计填充率</span><span>+4.8%</span></div><div class="impact-row"><span>地层沉降风险</span><span>低</span></div></div><div class="modal-actions"><button class="action-button ghost" id="cancelGrout">取消</button><button class="action-button primary" id="confirmGrout">确认并下发</button></div>');
+        $('#cancelGrout').addEventListener('click',closeModal); $('#confirmGrout').addEventListener('click',applyGrout);
+      }
+      function applyGrout(){
+        closeModal(); $('#groutTarget').textContent='7.0'; $('#goalGrout').textContent='7.0'; $('#groutGoalLabel').textContent='目标 7.0'; $('#groutParameter').style.background='rgba(255,138,61,.08)'; $('#groutGoalItem').classList.add('intervened'); $('#groutGoalItem .goal-label').textContent='✋ 同步注浆';
+        addMessage('karl','指令已通过安全审核并下发：第 356 环同步注浆目标 7.0 m³。执行结果将持续回报。'); $('#subtitle').textContent='指令已下发：第 356 环同步注浆目标调整为 7.0 立方米。'; toast('参数已成功下发','本环同步注浆目标：7.0 m³','✓');
+      }
+
+      function addMessage(type, text) {
+        var el=document.createElement('div'); el.className='message '+type; var now=new Date(); el.innerHTML=text+'<div class="message-time">'+now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false})+'</div>'; $('#messages').appendChild(el); $('#messages').scrollTop=$('#messages').scrollHeight;
+      }
+      function openDrawer(){ $('#karlDrawer').classList.add('show'); setTimeout(function(){ $('#commandInput').focus(); },100); }
+      $('#closeDrawer').addEventListener('click',function(){ $('#karlDrawer').classList.remove('show'); }); $('#subtitleBar').addEventListener('click',openDrawer);
+
+      var orb=$('#karlOrb'), dragging=false, moved=false, offset={x:0,y:0};
+      orb.addEventListener('pointerdown',function(e){ dragging=true; moved=false; offset.x=e.clientX-orb.offsetLeft; offset.y=e.clientY-orb.offsetTop; orb.setPointerCapture(e.pointerId); orb.style.cursor='grabbing'; });
+      orb.addEventListener('pointermove',function(e){ if(!dragging)return; moved=true; var x=Math.max(8,Math.min(innerWidth-orb.offsetWidth-8,e.clientX-offset.x)); var y=Math.max(74,Math.min(innerHeight-orb.offsetHeight-8,e.clientY-offset.y)); orb.style.left=x+'px'; orb.style.top=y+'px'; orb.style.bottom='auto'; });
+      orb.addEventListener('pointerup',function(){ dragging=false; orb.style.cursor='grab'; if(!moved)openDrawer(); });
+
+      function processCommand(raw) {
+        var text=raw.trim(); if(!text)return; addMessage('user',text); $('#commandInput').value=''; orb.classList.add('thinking'); $('#assistantState').textContent='◌ 正在分析指令…';
+        setTimeout(function(){ orb.classList.remove('thinking'); $('#assistantState').textContent='● 在线 · 等待指令';
+          if(/注浆|7方|7\.0/.test(text)){ addMessage('karl','我已识别到参数修改意图。正在检查安全边界，请确认修改范围。'); showGroutConfirm(); }
+          else if(/报警|告警/.test(text)){ addMessage('karl','正在演示二级预警播报。'); showAlarm(); }
+          else if(/为什么|转速|扭矩/.test(text)){ addMessage('karl','刀盘转速下调主要因为扭矩在最近 3 分钟持续升高。系统为避免进入红色安全区，先降低转速并保持推进速度。当前地层进入粉质黏土夹砂层，建议继续观察渣土流塑性。'); $('#subtitle').textContent='刀盘转速下调是为了抑制持续升高的扭矩，当前安全互锁正常。'; }
+          else if(/渗漏|间隙/.test(text)){ showEventForm(text); }
+          else { addMessage('karl','我已记录：“'+text+'”。目前没有匹配到明确控制指令，请补充具体参数或希望执行的动作。'); }
+        },650);
+      }
+      $('#sendCommand').addEventListener('click',function(){processCommand($('#commandInput').value);}); $('#commandInput').addEventListener('keydown',function(e){if(e.key==='Enter')processCommand(e.target.value);});
+      $$('.prompt-chip').forEach(function(btn){btn.addEventListener('click',function(){processCommand(btn.textContent);});});
+
+      function showEventForm(text){
+        addMessage('karl','已识别为现场异常事件。我预填了结构化记录，请核对后提交。');
+        openModal('<div class="modal-head"><div><div class="modal-kicker">现场事件采集</div><div class="modal-title">盾尾渗漏 · 待核对</div><div class="modal-copy">Karl 已根据语音内容完成槽位提取，可通过触摸修改。</div></div><button class="close-button">×</button></div><label class="field-label">事件位置</label><input class="text-field" value="盾尾 6 点位"><label class="field-label">现象描述</label><textarea class="text-field" rows="2">'+text+'</textarea><label class="field-label">严重程度</label><div class="reason-grid"><button class="reason-choice selected">轻微渗水</button><button class="reason-choice">连续滴漏</button><button class="reason-choice">喷涌</button><button class="reason-choice">待现场核查</button></div><div class="modal-actions"><button class="action-button ghost" id="cancelEvent">取消</button><button class="action-button primary" id="submitEvent">提交并诊断</button></div>');
+        $$('.reason-choice').forEach(function(btn){btn.addEventListener('click',function(){$$('.reason-choice').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');});});
+        $('#cancelEvent').addEventListener('click',closeModal); $('#submitEvent').addEventListener('click',function(){closeModal();toast('现场事件已记录','分析智能体正在交叉验证相关参数','✓');addMessage('karl','事件已记录。我将对尾刷压力、注脂量和盾尾间隙进行交叉验证。');});
+      }
+
+      function showAlarm(){ state.alarmOpen=true; $('#alarmBanner').classList.add('show'); orb.classList.add('alert'); $('#subtitle').textContent='预警：刀盘扭矩持续升高，已达到安全边界的 81%。请确认收到。'; }
+      $('#ackAlarm').addEventListener('click',function(){state.alarmOpen=false;$('#alarmBanner').classList.remove('show');orb.classList.remove('alert');toast('预警已确认','Karl 将继续跟踪扭矩变化','✓');});
+      $('#alarmDetails').addEventListener('click',function(){ $('#alarmBanner').classList.remove('show'); orb.classList.remove('alert'); openModal('<div class="modal-head"><div><div class="modal-kicker">智能诊断 · 归因分析</div><div class="modal-title">刀盘扭矩持续升高</div><div class="modal-copy">近 3 分钟扭矩上升 12%，尚未突破 6.0 MN·m 的安全线。</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>地层黏性增强</span><span>关联度 72%</span></div><div class="impact-row"><span>渣土改良不足</span><span>关联度 48%</span></div><div class="impact-row"><span>刀盘结泥饼</span><span>关联度 21%</span></div></div><div class="modal-copy">建议：保持当前推速，观察 2 分钟；如扭矩继续升高，调整泡沫注入比并降低推速上限。</div><div class="modal-actions"><button class="action-button ghost" id="observeBtn">继续观察</button><button class="action-button primary" id="openStrategy">查看建议策略</button></div>'); $('#observeBtn').addEventListener('click',closeModal); $('#openStrategy').addEventListener('click',function(){closeModal();openDrawer();addMessage('karl','建议策略：推速上限降至 25 mm/min，泡沫注入比提高 3%，执行前需再次确认。');}); });
+
+      $('#micBtn').addEventListener('click',function(){openDrawer();orb.classList.add('listening');$('#assistantState').textContent='⌁ 正在聆听…';$('#subtitle').textContent='Karl 正在聆听，请说出你的指令…';setTimeout(function(){orb.classList.remove('listening');$('#assistantState').textContent='● 在线 · 等待指令';$('#commandInput').focus();},2600);});
+      $('#muteBtn').addEventListener('click',function(){state.muted=!state.muted;this.textContent=state.muted?'♩':'♬';toast(state.muted?'语音播报已静音':'语音播报已开启','字幕将始终保留',state.muted?'×':'✓');});
+
+      $$('.tab').forEach(function(btn){btn.addEventListener('click',function(){state.trend=btn.dataset.trend;$$('.tab').forEach(function(b){b.classList.toggle('active',b===btn);});resizeCanvas($('#trendCanvas'),drawTrend);});});
+
+      $$('.dock-button').forEach(function(btn){btn.addEventListener('click',function(){
+        var name=btn.dataset.dock;
+        if(name==='报警中心'){showAlarm();return;}
+        var content={
+          '工序管理':'当前工序：掘进中 · 下一步：同步注浆完成检查。第 356 环总体进度 72%。',
+          '生产报表':'今日累计掘进 8.4 m，完成 7 环；平均推速 22.6 mm/min，设备利用率 91%。',
+          '智能诊断':'系统检测到 1 项需观察：刀盘扭矩负载 81%；其他关键系统运行正常。',
+          '知识库':'可检索操作规程、故障案例、地层处置方案和历史班组经验。',
+          '交接班':'当前班次 08:00—16:00，待交接事项 3 项，重要报警均已确认。'
+        };
+        openModal('<div class="modal-head"><div><div class="modal-kicker">功能中心</div><div class="modal-title">'+name+'</div><div class="modal-copy">'+content[name]+'</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>数据更新时间</span><span>刚刚</span></div><div class="impact-row"><span>系统状态</span><span>在线</span></div></div><div class="modal-actions"><button class="action-button primary" id="dockClose">完成</button></div>');$('#dockClose').addEventListener('click',closeModal);
+      });});
+
+      $('#settingsBtn').addEventListener('click',function(){openModal('<div class="modal-head"><div><div class="modal-kicker">驾驶舱设置</div><div class="modal-title">显示与触控</div><div class="modal-copy">当前为井下深色模式，关键触控热区已按手套操作优化。</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>显示主题</span><span>井下深色</span></div><div class="impact-row"><span>手套模式</span><span>已开启</span></div><div class="impact-row"><span>语音字幕</span><span>始终显示</span></div></div><div class="modal-actions"><button class="action-button primary" id="settingsClose">完成</button></div>');$('#settingsClose').addEventListener('click',closeModal);});
+
+      setTimeout(function(){ toast('原型演示已就绪','点击 Karl、模式开关、参数调节或底部功能入口体验','K'); },500);
+    })();
+  </script>
+</body>
+</html>

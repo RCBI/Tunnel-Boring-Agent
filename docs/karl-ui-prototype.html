@@ -167,6 +167,11 @@
     .view-title { font-size: 12px; font-weight: 750; letter-spacing: .08em; }
     .view-sub { color: var(--muted); font-size: 10px; margin-top: 5px; }
     .risk-pill { display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,200,87,.3); background: rgba(15,19,24,.72); border-radius: 10px; padding: 8px 11px; color: var(--amber); font-size: 10px; backdrop-filter: blur(8px); }
+    button.risk-pill { pointer-events:auto;cursor:pointer;font:inherit; }
+    button.risk-pill:hover { background:rgba(255,200,87,.12);border-color:rgba(255,200,87,.55); }
+    .scene-tabs { display:flex;gap:4px;margin-top:10px;pointer-events:auto; }
+    .scene-tab { min-height:28px;padding:0 10px;border-radius:8px;border:1px solid rgba(170,195,220,.13);background:rgba(8,13,18,.56);color:#8999a8;font-size:9px;font-weight:650;cursor:pointer;backdrop-filter:blur(8px); }
+    .scene-tab.active { color:var(--mode);border-color:color-mix(in srgb,var(--mode) 35%,transparent);background:var(--mode-soft); }
     .tunnel-legend { display: flex; gap: 16px; align-items: center; color: #a9b6c4; font-size: 9px; }
     .legend-item::before { content: ""; display: inline-block; width: 16px; height: 2px; border-radius: 2px; background: currentColor; vertical-align: middle; margin-right: 6px; }
     .legend-item.design { color: var(--blue); }
@@ -529,8 +534,8 @@
           <div class="canvas-wrap"><canvas id="tunnelCanvas" aria-label="隧道纵断面与前方环境"></canvas></div>
           <div class="tunnel-overlay">
             <div class="tunnel-top">
-              <div><div class="view-title">前方环境 · 隧道纵断面</div><div class="view-sub">预测范围 0—60 m · 地层与邻近设施实时融合</div></div>
-              <div class="risk-pill">△ 前方 38 m · 富水砂层</div>
+              <div><div class="view-title" id="sceneTitle">前方环境 · 线路地层剖面</div><div class="view-sub" id="sceneSub">预测范围 0—60 m · 显示沿线路的地层变化与邻近设施</div><div class="scene-tabs" role="tablist"><button class="scene-tab active" data-scene="section">线路剖面</button><button class="scene-tab" data-scene="drive">掘进视角</button></div></div>
+              <button class="risk-pill" id="riskPill">△ 前方 38 m · 富水砂层</button>
             </div>
             <div class="tunnel-legend"><span class="legend-item design">设计轴线</span><span class="legend-item actual">实际轨迹</span><span class="legend-item ring">已拼装环</span></div>
           </div>
@@ -602,7 +607,7 @@
 
   <script>
     (function () {
-      var state = { mode: 'auto', maxSpeed: 30, trend: 'attitude', muted: false, alarmOpen: false, selectedReason: '' };
+      var state = { mode: 'auto', maxSpeed: 30, trend: 'attitude', scene: 'section', previousScene: 'section', muted: false, alarmOpen: false, selectedReason: '' };
       var $ = function (selector) { return document.querySelector(selector); };
       var $$ = function (selector) { return Array.prototype.slice.call(document.querySelectorAll(selector)); };
 
@@ -990,7 +995,7 @@
         ctx.font='10px sans-serif'; ctx.textAlign='left'; ctx.fillText('38m',riskX+20,riskY+4);
       }
 
-      function drawTunnel(ctx, w, h) {
+      function drawTunnelLegacyV4(ctx, w, h) {
         ctx.clearRect(0,0,w,h);
 
         var soil=ctx.createLinearGradient(0,0,0,h);
@@ -1067,6 +1072,96 @@
         var riskX=w*.81,riskY=h*.3;ctx.fillStyle='rgba(255,200,87,.22)';ctx.beginPath();ctx.arc(riskX,riskY,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffc857';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('!',riskX,riskY+5);
       }
 
+      function drawGroundBase(ctx,w,h,sectionMode){
+        var ground=ctx.createLinearGradient(0,0,0,h);ground.addColorStop(0,'#26363b');ground.addColorStop(.18,'#43534e');ground.addColorStop(.48,'#51483a');ground.addColorStop(1,'#2d3029');ctx.fillStyle=ground;ctx.fillRect(0,0,w,h);
+        ctx.fillStyle='#1f3036';ctx.fillRect(0,0,w,h*.13);
+        var strata=[{y:.16,a:5,c:'#52635d'},{y:.31,a:7,c:'#4a4941'},{y:.48,a:8,c:'#36565a'},{y:.64,a:6,c:'#5a4936'},{y:.82,a:5,c:'#363a31'}];
+        strata.forEach(function(s,si){ctx.beginPath();ctx.moveTo(0,h*s.y);for(var x=0;x<=w;x+=18)ctx.lineTo(x,h*s.y+Math.sin(x*.019+si*1.4)*s.a);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=s.c;ctx.fill();});
+        ctx.strokeStyle='rgba(180,194,187,.18)';ctx.lineWidth=1;
+        for(var boundary=1;boundary<strata.length;boundary++){var b=strata[boundary];ctx.beginPath();for(var bx=0;bx<=w;bx+=18){var by=h*b.y+Math.sin(bx*.019+boundary*1.4)*b.a;if(bx===0)ctx.moveTo(bx,by);else ctx.lineTo(bx,by);}ctx.stroke();}
+
+        /* Surface buildings are rectangles; buried utilities are circles. */
+        ctx.fillStyle='#7d8e8b';[[.06,.065,.05,.065],[.14,.045,.036,.085],[.22,.075,.06,.055],[.73,.05,.045,.08],[.82,.07,.07,.06]].forEach(function(b){ctx.fillRect(w*b[0],h*b[1],w*b[2],h*b[3]);});
+        ctx.fillStyle='#b0bbb8';for(var win=0;win<11;win++)ctx.fillRect(w*(.067+win*.018),h*.083,3,3);
+        [[.34,.25,8],[.40,.25,5],[.91,.22,7]].forEach(function(p){ctx.fillStyle='#263238';ctx.strokeStyle='#9faaa6';ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*p[0],h*p[1],p[2],0,Math.PI*2);ctx.fill();ctx.stroke();});
+        ctx.strokeStyle='rgba(167,181,176,.32)';ctx.lineWidth=2;[.1,.26,.77,.86].forEach(function(px){for(var pile=0;pile<3;pile++){ctx.beginPath();ctx.moveTo(w*px+pile*5,h*.13);ctx.lineTo(w*px+pile*5,h*(sectionMode ? .34 : .31));ctx.stroke();}});
+      }
+
+      function drawLongitudinalSection(ctx,w,h){
+        ctx.clearRect(0,0,w,h);drawGroundBase(ctx,w,h,true);
+        var startX=w*.055,tailX=w*.54,cutterX=w*.67,riskX=w*.83;
+        function cy(x){var t=(x-startX)/(cutterX-startX);return h*(.72-.09*t+.018*Math.sin(t*Math.PI));}
+        function path(from,to){ctx.beginPath();ctx.moveTo(from,cy(from));for(var x=from+6;x<=to;x+=6)ctx.lineTo(x,cy(x));}
+        var d=Math.max(36,Math.min(48,h*.18));
+
+        /* Completed lining ends exactly at the shield tail. */
+        path(startX,tailX+1);ctx.strokeStyle='#a8b2af';ctx.lineWidth=d+9;ctx.lineCap='butt';ctx.stroke();
+        path(startX,tailX+1);ctx.strokeStyle='#4d5956';ctx.lineWidth=d+3;ctx.stroke();
+        path(startX,tailX+1);ctx.strokeStyle='#111a1d';ctx.lineWidth=d-10;ctx.stroke();
+        for(var ring=startX+12;ring<tailX;ring+=Math.max(17,w*.031)){var y=cy(ring);ctx.strokeStyle='rgba(213,222,218,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ring,y-d*.5-4);ctx.lineTo(ring,y-d*.5+6);ctx.stroke();ctx.beginPath();ctx.moveTo(ring,y+d*.5-6);ctx.lineTo(ring,y+d*.5+4);ctx.stroke();}
+
+        /* Smaller shield body occupies the same bore without any clearance gap. */
+        var shield=ctx.createLinearGradient(0,cy(tailX)-d/2,0,cy(tailX)+d/2);shield.addColorStop(0,'#e9bd48');shield.addColorStop(.45,'#bd8122');shield.addColorStop(1,'#684413');
+        path(tailX-1,cutterX);ctx.strokeStyle=shield;ctx.lineWidth=d+7;ctx.stroke();
+        [tailX,tailX+(cutterX-tailX)*.43,tailX+(cutterX-tailX)*.78].forEach(function(rx,ri){var ry=cy(rx);ctx.strokeStyle=ri===0?'#3f301a':'rgba(73,47,10,.55)';ctx.lineWidth=ri===0?4:2;ctx.beginPath();ctx.moveTo(rx,ry-d*.5);ctx.lineTo(rx,ry+d*.5);ctx.stroke();});
+        var headY=cy(cutterX);
+
+        path(startX,cutterX);ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#eef4f3';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(startX,cy(startX)+5);for(var ax=startX+8;ax<=cutterX;ax+=8)ctx.lineTo(ax,cy(ax)+4+Math.sin(ax*.025));ctx.stroke();
+
+        /* Sealed cutterhead closes the shield face and sits above the axis overlays. */
+        var cutterFace=ctx.createLinearGradient(cutterX-10,0,cutterX+10,0);cutterFace.addColorStop(0,'#5a2f20');cutterFace.addColorStop(.34,'#c06d42');cutterFace.addColorStop(.62,'#8d482e');cutterFace.addColorStop(1,'#3a2019');
+        ctx.fillStyle=cutterFace;ctx.strokeStyle='#ffd66c';ctx.lineWidth=2.2;ctx.beginPath();ctx.ellipse(cutterX,headY,10,d*.59,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#2d1b18';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(cutterX,headY,7.7,d*.49,0,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle='rgba(255,190,128,.78)';ctx.lineWidth=1.15;
+        for(var spoke=0;spoke<12;spoke++){var sa=spoke*Math.PI/6;ctx.beginPath();ctx.moveTo(cutterX,headY);ctx.lineTo(cutterX+Math.cos(sa)*7.4,headY+Math.sin(sa)*d*.47);ctx.stroke();}
+        ctx.strokeStyle='rgba(45,24,20,.85)';ctx.beginPath();ctx.ellipse(cutterX,headY,5.2,d*.33,0,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.ellipse(cutterX,headY,2.8,d*.17,0,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#f2aa63';for(var tool=0;tool<14;tool++){var ta=tool*Math.PI/7;var tr=tool%2?1:.64;var tx=cutterX+Math.cos(ta)*7.2*tr;var ty=headY+Math.sin(ta)*d*.46*tr;ctx.fillRect(tx-1.2,ty-1.4,2.4,2.8);}
+        ctx.fillStyle='#241817';ctx.strokeStyle='#e69a55';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(cutterX,headY,2.1,d*.095,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+
+        /* The 38 m change is a vertical station, clickable through the pill. */
+        ctx.fillStyle='rgba(53,144,165,.28)';ctx.fillRect(riskX-w*.018,h*.51,w*.036,h*.17);
+        ctx.strokeStyle='rgba(111,196,213,.58)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(riskX,h*.2);ctx.lineTo(riskX,h*.88);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#ffc857';ctx.font='600 10px sans-serif';ctx.textAlign='center';ctx.fillText('前方 38 m',riskX,h*.37);
+        ctx.fillStyle='rgba(10,15,17,.78)';ctx.fillRect(w*.5,h*.25,w*.17,22);ctx.fillStyle='#dce5e3';ctx.textAlign='left';ctx.fillText('掘进方向  →',w*.515,h*.25+15);
+      }
+
+      function drawExcavationPerspective(ctx,w,h,atRisk){
+        ctx.clearRect(0,0,w,h);
+        var layers=atRisk?
+          [{y:0,h:.14,c:'#26353a',n:''},{y:.14,h:.15,c:'#435641',n:'① 杂填土'},{y:.29,h:.16,c:'#684748',n:'② 粉质黏土'},{y:.45,h:.25,c:'#35687a',n:'③ 富水砂层（当前断面）'},{y:.70,h:.22,c:'#5a503d',n:'④ 粉细砂'}]:
+          [{y:0,h:.14,c:'#26353a',n:''},{y:.14,h:.15,c:'#455742',n:'① 杂填土'},{y:.29,h:.16,c:'#674849',n:'② 粉质黏土'},{y:.45,h:.18,c:'#386878',n:'③ 富水砂层'},{y:.63,h:.27,c:'#5b513e',n:'④ 粉细砂（当前掘进层）'}];
+        layers.forEach(function(l){ctx.fillStyle=l.c;ctx.fillRect(0,h*l.y,w,h*l.h+1);if(l.n){ctx.fillStyle='rgba(224,233,230,.68)';ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText(l.n,w*.035,h*(l.y+l.h*.55));}});
+        if(atRisk){ctx.strokeStyle='rgba(126,203,222,.34)';ctx.lineWidth=1;for(var hatch=-5;hatch<22;hatch++){ctx.beginPath();ctx.moveTo(hatch*52,h*.70);ctx.lineTo(hatch*52+95,h*.45);ctx.stroke();}}
+
+        /* Surface environment: rectangles are buildings, circles are utilities. */
+        ctx.fillStyle='#6f8994';[[.18,.055,.045,.085],[.34,.08,.035,.06],[.72,.045,.05,.095],[.84,.075,.035,.065]].forEach(function(b){ctx.fillRect(w*b[0],h*b[1],w*b[2],h*b[3]);ctx.strokeStyle='#9bb1ba';ctx.lineWidth=1;ctx.strokeRect(w*b[0],h*b[1],w*b[2],h*b[3]);});
+        [[.28,.22],[.69,.22]].forEach(function(p){ctx.fillStyle='#1c2430';ctx.strokeStyle='#9fb1bd';ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*p[0],h*p[1],6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#7789a9';ctx.beginPath();ctx.arc(w*p[0],h*p[1],2,0,Math.PI*2);ctx.fill();});
+
+        /* Large tunnel portal and concentric installed rings follow the reference. */
+        var cx=w*.52,cy=h*.79,portalR=Math.min(w*.27,h*.66);
+        ctx.fillStyle='#090f17';ctx.beginPath();ctx.arc(cx,cy,portalR,0,Math.PI*2);ctx.fill();
+        [1,.84,.69,.55,.43,.32].forEach(function(scale,index){ctx.strokeStyle=index>3?'rgba(151,221,174,.72)':'rgba(93,139,112,.48)';ctx.lineWidth=index>3?3:4;ctx.beginPath();ctx.arc(cx,cy,portalR*scale,0,Math.PI*2);ctx.stroke();});
+
+        /* Forward corridor and the 38 m geology station. */
+        var vanY=h*.38;ctx.fillStyle=atRisk?'rgba(76,164,184,.20)':'rgba(61,126,151,.15)';ctx.beginPath();ctx.moveTo(cx-w*.018,vanY);ctx.lineTo(cx+w*.018,vanY);ctx.lineTo(cx+portalR*.27,cy);ctx.lineTo(cx-portalR*.27,cy);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.7;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(cx,h);ctx.lineTo(cx,vanY);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#eef3f5';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(cx-8,h);ctx.quadraticCurveTo(cx-3,h*.67,cx+1,vanY);ctx.stroke();
+        ctx.strokeStyle='rgba(154,177,188,.6)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(cx-w*.035,vanY+h*.02);ctx.lineTo(cx+w*.035,vanY+h*.02);ctx.lineTo(cx+w*.055,vanY+h*.10);ctx.lineTo(cx-w*.055,vanY+h*.10);ctx.closePath();ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle=atRisk?'rgba(72,171,194,.42)':'rgba(72,147,171,.28)';ctx.fillRect(cx-w*.052,vanY+h*.065,w*.104,h*.022);
+        ctx.fillStyle='#ffc857';ctx.font='600 10px sans-serif';ctx.textAlign='left';ctx.fillText(atRisk?'K12+383.8 · 富水砂层断面':'38 m · 进入富水砂层',cx+w*.065,vanY+h*.09);
+
+        /* Smaller shield-machine face on the common alignment. */
+        var mr=Math.min(portalR*.22,h*.14);var machine=ctx.createRadialGradient(cx-mr*.28,cy-mr*.3,2,cx,cy,mr);machine.addColorStop(0,'#8997aa');machine.addColorStop(.72,'#4d5969');machine.addColorStop(1,'#222b37');ctx.fillStyle=machine;ctx.strokeStyle='#aab7c8';ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,mr,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#cbd4df';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-mr*.48,cy);ctx.lineTo(cx+mr*.48,cy);ctx.moveTo(cx,cy-mr*.48);ctx.lineTo(cx,cy+mr*.48);ctx.stroke();ctx.fillStyle='#e1e8ef';ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(9,14,20,.76)';ctx.fillRect(w*.25,h*.76,w*.18,36);ctx.fillStyle='#dce5ea';ctx.font='600 9px sans-serif';ctx.fillText(atRisk?'前方盾构姿态预测':'盾构机 · 第 356 环',w*.265,h*.76+14);ctx.fillStyle='#8999a8';ctx.font='8px sans-serif';ctx.fillText(atRisk?'预计垂直 +5 mm / 水平 −2 mm':'垂直 −8 mm / 水平 +12 mm',w*.265,h*.76+27);
+      }
+
+      function drawDriveView(ctx,w,h){drawExcavationPerspective(ctx,w,h,false);}
+      function drawRiskSection(ctx,w,h){drawExcavationPerspective(ctx,w,h,true);}
+
+      function drawTunnel(ctx,w,h){
+        if(state.scene==='drive')drawDriveView(ctx,w,h);else if(state.scene==='risk')drawRiskSection(ctx,w,h);else drawLongitudinalSection(ctx,w,h);
+      }
+
       function drawPressure(ctx,w,h){
         ctx.clearRect(0,0,w,h);var p={l:3,r:3,t:5,b:5};var values=[2.78,2.80,2.79,2.83,2.84,2.81,2.82,2.86,2.84,2.82,2.83,2.82];
         function px(i){return p.l+(w-p.l-p.r)*i/(values.length-1);}function py(v){return p.t+(h-p.t-p.b)*(3.15-v)/.65;}
@@ -1101,6 +1196,19 @@
         resizeCanvas($('#pressureCanvas'), drawPressure);
       }
       window.addEventListener('resize', redraw); setTimeout(redraw, 20);
+
+      function updateScene(scene){
+        state.scene=scene;
+        var titles={section:'前方环境 · 线路地层剖面',drive:'前方环境 · 掘进视角',risk:'前方 38 m · 掘进视角'};
+        var subs={section:'预测范围 0—60 m · 显示沿线路的地层变化与邻近设施',drive:'当前掘进环境 · 地层、建筑与地下管线实时融合',risk:'K12+383.8 · 已根据富水砂层及邻近环境更新预测场景'};
+        $('#sceneTitle').textContent=titles[scene];$('#sceneSub').textContent=subs[scene];
+        $('#riskPill').textContent=scene==='risk'?'← 返回前方环境':'△ 前方 38 m · 富水砂层';
+        $$('.scene-tab').forEach(function(btn){btn.classList.toggle('active',(scene==='risk'?state.previousScene:scene)===btn.dataset.scene);});
+        $('.tunnel-legend').style.display=scene==='risk'?'none':'flex';
+        resizeCanvas($('#tunnelCanvas'),drawTunnel);
+      }
+      $$('.scene-tab').forEach(function(btn){btn.addEventListener('click',function(){state.previousScene=btn.dataset.scene;updateScene(btn.dataset.scene);});});
+      $('#riskPill').addEventListener('click',function(){if(state.scene==='risk')updateScene(state.previousScene);else{state.previousScene=state.scene;updateScene('risk');}});
 
       function toast(title, copy, icon) {
         var el = document.createElement('div'); el.className = 'toast';

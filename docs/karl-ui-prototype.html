@@ -226,8 +226,8 @@
     .voice-button { min-width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 15px; background: #0c121a; cursor: pointer; font-size: 19px; }
     .voice-button.primary { background: var(--mode-soft); border-color: color-mix(in srgb, var(--mode) 30%, transparent); color: var(--mode); }
 
-    .alarm-banner { position: fixed; top: 66px; left: 0; right: 0; min-height: 64px; transform: translateY(-110%); opacity: 0; transition: .3s ease; z-index: 60; background: linear-gradient(90deg, #be172b, #ef3f51 45%, #be172b); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 10px 25px; box-shadow: 0 12px 35px rgba(255,0,42,.25); }
-    .alarm-banner.show { transform: translateY(0); opacity: 1; }
+    .alarm-banner { position: fixed; top: 66px; left: 0; right: 0; min-height: 64px; transform: translateY(-110%); opacity: 0; visibility:hidden; pointer-events:none; transition:transform .3s ease,opacity .3s ease,visibility 0s linear .3s; z-index: 60; background: linear-gradient(90deg, #be172b, #ef3f51 45%, #be172b); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 10px 25px; box-shadow: 0 12px 35px rgba(255,0,42,.25); }
+    .alarm-banner.show { transform: translateY(0); opacity: 1; visibility:visible; pointer-events:auto; transition-delay:0s; }
     .alarm-icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(0,0,0,.17); display: grid; place-items: center; font-size: 21px; }
     .alarm-title { font-weight: 800; font-size: 14px; }
     .alarm-copy { font-size: 11px; opacity: .82; margin-top: 3px; }
@@ -260,6 +260,7 @@
     .text-field { width: 100%; min-height: 48px; border: 1px solid var(--line-strong); border-radius: 12px; background: #0a1017; color: var(--text); padding: 12px; resize: vertical; }
     .reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
     .reason-choice { min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.02); cursor: pointer; color: #b2bfcc; }
+    .reason-choice small { display:inline-block;margin-top:5px;color:var(--muted);font-size:9px;line-height:1.35; }
     .reason-choice.selected { color: var(--orange); border-color: rgba(255,138,61,.5); background: rgba(255,138,61,.08); }
 
     .drawer { position: fixed; right: 18px; bottom: 86px; width: min(410px, calc(100vw - 36px)); height: min(620px, calc(100vh - 170px)); z-index: 70; border: 1px solid var(--line-strong); border-radius: 22px; background: rgba(12,18,27,.97); box-shadow: 0 24px 80px rgba(0,0,0,.55); backdrop-filter: blur(18px); display: none; grid-template-rows: auto minmax(0,1fr) auto; overflow: hidden; }
@@ -354,7 +355,7 @@
     .target-pose { left: calc(50% + 7px); top: calc(50% + 4px); width: 14px; height: 14px; border: 2px solid #72bfff; transform: translate(-50%,-50%) rotate(45deg); background: rgba(41,167,255,.16); box-shadow: 0 0 7px rgba(41,167,255,.55); }
     .pose-legend { width: 100%; display: grid; gap: 6px; color: #9eacba; font-size: 10px; }
     .pose-legend span { display: flex; align-items: center; gap: 8px; }
-    .legend-shape { width: 10px; height: 10px; flex: 0 0 auto; display: inline-block; }
+    .legend-shape { width: 5px; height: 5px; flex: 0 0 auto; display: inline-block; }
     .legend-shape.triangle { width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid var(--orange); }
     .legend-shape.circle { border-radius: 50%; border: 2px solid var(--green); }
     .legend-shape.target-symbol { border: 2px solid #72bfff; transform: rotate(45deg); }
@@ -441,6 +442,125 @@
       .target-v2 { width:160px; }
       .trend-canvas { min-height:180px; }
     }
+
+    /* V4 refinement: project identity, engineering ranges and stage objectives. */
+    .app { grid-template-rows:78px minmax(0,1fr) 76px; }
+    .topbar { grid-template-columns:minmax(300px,.82fr) minmax(680px,1.9fr) minmax(250px,.7fr); min-height:78px; }
+    .brand-sub { white-space:nowrap; font-size:10px; letter-spacing:.06em; text-transform:none; }
+    .header-center { min-width:0;display:grid;grid-template-columns:minmax(270px,1fr) auto;align-items:center;gap:26px; }
+    .project-name { color:#dce6ee;font-size:16px;font-weight:700;letter-spacing:.045em;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:8%; }
+    .run-meta { justify-content:flex-end;gap:20px; }
+    .state-current { display:inline-flex;align-items:center;min-height:24px;padding:0 9px;border-radius:7px;font-style:normal;font-size:11px;font-weight:750; }
+    .state-current.driving { color:#55b7ff;background:rgba(41,167,255,.12);box-shadow:inset 0 0 0 1px rgba(41,167,255,.25); }
+    .state-current.assembling { color:#4dd8a0;background:rgba(77,216,160,.11);box-shadow:inset 0 0 0 1px rgba(77,216,160,.23); }
+    .state-current.stopped { color:#eef5fb;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2); }
+    .user-button { width:58px;height:48px;display:flex;flex-direction:column;gap:1px;font-size:18px; }
+    .user-button small { font-size:8px;color:var(--muted); }
+    .alarm-banner { top:78px; }
+
+    .target-v2 { width:min(14vw,180px);max-height:180px;background:linear-gradient(90deg,transparent 49.5%,rgba(170,195,220,.24) 50%,transparent 50.5%),linear-gradient(transparent 49.5%,rgba(170,195,220,.24) 50%,transparent 50.5%);border-color:transparent; }
+    .pose-ring { position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none; }
+    .ring-25 { width:30%;height:30%;border:1.5px solid rgba(41,167,255,.9); }
+    .ring-50 { width:60%;height:60%;border:1.5px solid rgba(41,167,255,.65); }
+    .ring-75 { width:90%;height:90%;border:1.5px solid rgba(255,200,87,.78); }
+    .actual-cutter { left:calc(50% + 13px);top:calc(50% + 9px);width:6.5px;height:6.5px;background:#29a7ff;transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 3.5px rgba(41,167,255,.7); }
+    .actual-tail { left:calc(50% + 9px);top:calc(50% + 6px);width:6.5px;height:6.5px;border-radius:50%;background:#29a7ff;box-shadow:0 0 3.5px rgba(41,167,255,.7); }
+    .target-cutter { left:calc(50% + 5px);top:calc(50% + 3px);width:5.5px;height:5.5px;background:#fff;transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 3px rgba(255,255,255,.65); }
+    .target-tail { left:calc(50% + 3px);top:calc(50% + 2px);width:5.5px;height:5.5px;border-radius:50%;background:#fff;box-shadow:0 0 3px rgba(255,255,255,.65); }
+    .legend-shape.blue-diamond,.legend-shape.white-diamond { transform:rotate(45deg); }
+    .legend-shape.blue-diamond,.legend-shape.blue-circle { background:#29a7ff; }
+    .legend-shape.white-diamond,.legend-shape.white-circle { background:#fff; }
+    .legend-shape.blue-circle,.legend-shape.white-circle { border-radius:50%; }
+    .pose-legend { gap:4px; }
+
+    .parameters-v2 { grid-template-rows:auto auto minmax(98px,1.05fr) auto;gap:6px;padding:10px;overflow:hidden; }
+    .param-theme { padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.022);border:1px solid rgba(170,195,220,.075); }
+    .theme-title { color:#d7e1e9;font-size:10px;font-weight:750;letter-spacing:.06em;margin-bottom:5px; }
+    .machine-param-row { display:grid;grid-template-columns:minmax(108px,.75fr) minmax(150px,1.25fr);gap:8px;align-items:center;padding:3px 0; }
+    .machine-param-row > div:first-child { display:flex;justify-content:space-between;align-items:baseline;gap:5px; }
+    .machine-param-row span { color:var(--muted);font-size:9px; }
+    .machine-param-row strong { font-size:13px;font-weight:650;white-space:nowrap; }
+    .machine-param-row small { color:var(--muted);font-size:8px; }
+    .dual-range { min-width:0; }
+    .range-caption { display:flex;justify-content:space-between;color:var(--muted);font-size:8px;margin-bottom:5px; }
+    .range-caption b { color:#bdcbd6;font-weight:650; }
+    .range-track { position:relative;height:16px; }
+    .range-track::before { content:"";position:absolute;left:0;right:0;top:7px;height:4px;border-radius:3px;background:rgba(255,255,255,.13); }
+    .range-track i { position:absolute;top:7px;height:4px;border-radius:3px;background:var(--mode);left:25%;right:25%;pointer-events:none; }
+    .range-thumb { position:absolute;left:0;top:0;width:100%;height:16px;margin:0;background:transparent;appearance:none;pointer-events:none; }
+    .range-thumb::-webkit-slider-runnable-track { height:4px;background:transparent; }
+    .range-thumb::-webkit-slider-thumb { appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;border:2px solid #dce6ee;background:var(--mode);box-shadow:0 0 0 3px rgba(41,167,255,.12);pointer-events:auto;cursor:grab; }
+    .range-thumb::-moz-range-track { height:4px;background:transparent; }
+    .range-thumb::-moz-range-thumb { width:12px;height:12px;border-radius:50%;border:2px solid #dce6ee;background:var(--mode);pointer-events:auto;cursor:grab; }
+    .oil-zones { display:grid;grid-template-columns:1.2fr repeat(4,.65fr) auto;gap:4px;align-items:center;margin:3px 0 5px;color:var(--muted);font-size:8px; }
+    .oil-zones b { color:#c8d4dd;font-size:9px;font-weight:650;text-align:center; }
+    .oil-limits { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
+    .oil-limits > div { display:flex;align-items:center;justify-content:space-between;gap:4px; }
+    .oil-limits span { color:var(--muted);font-size:8px; }
+    .spin-control { display:grid;grid-template-columns:22px 34px 22px;align-items:center; }
+    .spin-control button { width:22px;height:22px;border:1px solid var(--line);background:rgba(255,255,255,.035);color:#acb9c5;cursor:pointer; }
+    .spin-control button:first-child { border-radius:6px 0 0 6px; }.spin-control button:last-child { border-radius:0 6px 6px 0; }
+    .spin-control b { height:22px;display:grid;place-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:9px;font-weight:650; }
+    .pressure-theme { border:1px solid rgba(41,167,255,.23);background:linear-gradient(145deg,rgba(41,167,255,.07),rgba(255,255,255,.018));min-height:100px; }
+    .pressure-theme .pressure-head { min-height:30px;font-size:11px; }
+    .pressure-theme .pressure-head > span { color:var(--mode);font-weight:750; }
+    .pressure-theme .pressure-head strong { font-size:18px; }
+    .pressure-theme .pressure-head small { font-size:9px;font-weight:500; }
+    .material-list { position:relative;padding-top:18px; }
+    .material-title { position:absolute;top:3px;left:3px;margin:0; }
+
+    .tunnel-card .risk-pill { position:absolute;right:16px;top:45%;font-size:9px;padding:6px 9px; }
+    .tunnel-legend { align-self:flex-end;justify-content:flex-end;background:rgba(6,10,14,.54);padding:6px 8px;border-radius:8px; }
+    .tunnel-card .scene-tabs { margin-top:0; }
+
+    .intel-row { grid-template-columns:minmax(300px,2fr) minmax(410px,3fr); }
+    .goal-card-v2 { padding:15px 18px; }
+    .goal-card-v2 .card-title { font-size:15px; }
+    .goal-card-v2 .goal-header { margin-bottom:10px; }
+    .stage-v3 { gap:8px; }
+    .stage-block { padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(170,195,220,.085); }
+    .stage-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:8px; }
+    .stage-head strong { font-size:13px; }.stage-head strong i { color:var(--mode);font-style:normal;font-size:10px;margin-left:6px;padding:3px 6px;border-radius:5px;background:var(--mode-soft); }
+    .stage-head span { color:var(--muted);font-size:11px; }.stage-head b { color:#e9f1f7;font-size:14px; }
+    .stage-values { display:grid;gap:5px; }.stage-values.four { grid-template-columns:1fr 1fr; }.stage-values.two { grid-template-columns:1fr; }
+    .stage-values span { display:flex;justify-content:space-between;gap:6px;color:#9eafbe;font-size:11px;padding:7px 8px;border-radius:6px;background:rgba(255,255,255,.032);white-space:nowrap; }
+    .stage-values b { color:#dce7ef;font-size:12px;font-weight:650; }
+    .assembly-ranges { display:grid;grid-template-columns:1fr;gap:8px; }
+    .assembly-ranges .range-caption { font-size:10px; }
+    .dual-range.compact .range-caption { margin-bottom:3px; }
+    .dual-range.compact .range-track { height:13px; }
+
+    @media (max-width:1280px) {
+      .topbar { grid-template-columns:270px 1fr 230px; }
+      .header-center { grid-template-columns:1fr auto;gap:12px; }
+      .run-meta { gap:10px; }.project-name { font-size:13px;padding-left:0; }
+      .machine-param-row { grid-template-columns:100px 1fr; }
+      .intel-row { grid-template-columns:minmax(280px,2fr) minmax(380px,3fr); }
+      .stage-values.four { grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width:920px), (max-height:690px) {
+      .app { grid-template-rows:62px auto 74px; }
+      .topbar { grid-template-columns:1fr auto;min-height:62px; }
+      .header-center { display:none; }
+      .alarm-banner { top:62px; }
+      .main { display:block; }
+      .left-column,.right-column { grid-template-rows:auto; }
+      .drive-grid,.intel-row { grid-template-columns:1fr; }
+      .parameters-v2 { min-height:520px; }
+      .machine-param-row { grid-template-columns:108px 1fr; }
+      .stage-values.four { grid-template-columns:1fr 1fr; }
+      .tunnel-card .risk-pill { right:10px;top:48%; }
+    }
+
+    /* V5 visual hierarchy and annotated layout refinements. */
+    .speed-primary { padding:0;display:grid;grid-template-columns:.72fr 1fr;align-items:stretch; }
+    .speed-label { justify-content:center;padding:0 16px;border-right:1px solid var(--line);font-size:18px;font-weight:500;white-space:nowrap; }
+    .speed-reading { justify-content:center;padding:0 18px;align-items:center; }
+    .speed-number { font-size:clamp(52px,4.4vw,70px); }
+    .speed-reading { gap:8px; }
+    .speed-unit { font-size:13px; }
+    .pressure-block { padding:9px 11px 7px;grid-template-rows:auto minmax(46px,1fr) auto; }
   </style>
 </head>
 <body>
@@ -450,16 +570,19 @@
         <div class="brand-mark">K</div>
         <div>
           <div class="brand-title">KARL · 盾构智能驾驶舱</div>
-          <div class="brand-sub">HUMAN–MACHINE COLLABORATION SYSTEM</div>
+          <div class="brand-sub">Human-Machine Synergy System</div>
         </div>
       </div>
 
-      <div class="run-meta" aria-label="运行信息">
-        <div class="meta-block"><span class="meta-label">当前环号</span><span class="meta-value">RING 356</span></div>
-        <div class="meta-block"><span class="meta-label">里程</span><span class="meta-value">K12+345.8</span></div>
-        <div class="meta-block boring-state"><span class="meta-label">掘进状态 · 采集系统</span><span class="meta-value state-options"><i class="state-option active">推进</i><i class="state-option">拼装</i><i class="state-option">停机</i></span></div>
-        <div class="meta-block"><span class="meta-label">系统时间</span><span class="meta-value" id="clock">14:26:08</span></div>
-        <div class="meta-block"><span class="meta-label">链路状态</span><span class="meta-value"><i class="status-dot"></i>正常</span></div>
+      <div class="header-center">
+        <div class="project-name">申通12号线3标沪科风井下行线</div>
+        <div class="run-meta" aria-label="运行信息">
+          <div class="meta-block"><span class="meta-label">当前环号</span><span class="meta-value">RING 356</span></div>
+          <div class="meta-block"><span class="meta-label">里程</span><span class="meta-value">K12+345.8</span></div>
+          <div class="meta-block boring-state"><span class="meta-label">掘进状态</span><span class="meta-value"><i class="state-current driving">推进</i></span></div>
+          <div class="meta-block"><span class="meta-label">系统时间</span><span class="meta-value" id="clock">14:26:08</span></div>
+          <div class="meta-block"><span class="meta-label">链路状态</span><span class="meta-value"><i class="status-dot"></i>正常</span></div>
+        </div>
       </div>
 
       <div class="top-actions">
@@ -467,21 +590,21 @@
           <button class="mode-option active" data-mode="auto">◉ 自动</button>
           <button class="mode-option" data-mode="manual">◯ 人工</button>
         </div>
-        <button class="icon-button" id="settingsBtn" aria-label="系统设置">⚙</button>
+        <button class="icon-button user-button" id="settingsBtn" aria-label="当前用户王工，点击进入系统配置或切换用户"><span>♙</span><small id="currentUserName">王工</small></button>
       </div>
     </header>
 
     <main class="main">
       <section class="column left-column" aria-label="掘进实况">
-        <div class="section-head"><span class="eyebrow">掘进实况 · Live drive</span><span class="live">数据实时</span></div>
+        <div class="section-head"><span class="eyebrow">掘进实况 · Live drive</span></div>
 
         <article class="card speed-card">
           <div class="speed-primary">
-            <div class="speed-label"><span class="autopilot-glyph">◉</span>推进速度</div>
+            <div class="speed-label">推进速度</div>
             <div class="speed-reading"><strong class="speed-number" id="speedValue">23</strong><span class="speed-unit">mm/min</span></div>
           </div>
           <div class="speed-control">
-            <div class="max-label">允许区间 · 15 — MAX</div>
+            <div class="max-label">最大允许速度</div>
             <div class="max-value" id="maxSpeed">30</div>
             <div class="stepper">
               <button id="speedDown" aria-label="降低速度上限">−</button>
@@ -495,36 +618,41 @@
           <article class="card attitude attitude-v2">
             <div class="card-title"><span>盾构姿态</span><span class="tag" id="attitudeModeTag">自动控制</span></div>
             <div class="attitude-stage">
-              <div class="target target-v2" aria-label="切口、盾尾与本环目标姿态靶图">
+              <div class="target target-v2" aria-label="切口、盾尾实际偏差与目标偏差靶图，量程正负75毫米，每环25毫米">
                 <span class="axis-label top">高程 +</span><span class="axis-label right">水平 +</span>
-                <i class="pose-marker target-pose" aria-label="本环目标"></i>
-                <i class="pose-marker cutter-pose" aria-label="切口位置"></i>
-                <i class="pose-marker tail-pose" aria-label="盾尾位置"></i>
+                <i class="pose-ring ring-25"></i><i class="pose-ring ring-50"></i><i class="pose-ring ring-75"></i>
+                <i class="pose-marker actual-cutter" aria-label="实际切口偏差"></i>
+                <i class="pose-marker actual-tail" aria-label="实际盾尾偏差"></i>
+                <i class="pose-marker target-cutter" aria-label="目标切口偏差"></i>
+                <i class="pose-marker target-tail" aria-label="目标盾尾偏差"></i>
               </div>
-              <div class="pose-legend"><span><i class="legend-shape triangle"></i>切口 +12 / −8</span><span><i class="legend-shape circle"></i>盾尾 +8 / −6</span><span><i class="legend-shape target-symbol"></i>本环目标 +5 / −3</span></div>
+              <div class="pose-legend"><span><i class="legend-shape blue-diamond"></i>实际切口 +12 / −8 mm</span><span><i class="legend-shape blue-circle"></i>实际盾尾 +8 / −6 mm</span><span><i class="legend-shape white-diamond"></i>目标切口 +5 / −3 mm</span><span><i class="legend-shape white-circle"></i>目标盾尾 +3 / −2 mm</span></div>
             </div>
             <div class="angle-strip"><div><span>滚动角</span><strong>+0.30°</strong></div><div><span>俯仰角</span><strong>−0.10°</strong></div></div>
           </article>
 
           <article class="card parameters parameters-v2">
-            <div class="card-title"><span>核心参数实时值</span><span class="live">PLC 实时</span></div>
-            <div class="core-list">
-              <div class="core-param" data-param="torque" data-low="3.5" data-high="5.8"><div><span class="parameter-name">刀盘扭矩</span><strong>5.26 <small>MN·m</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.1" aria-label="降低扭矩允许上限">−</button><span>允许 <b class="range-low">3.5</b>—<b class="range-high">5.8</b></span><button class="range-adjust" data-step="0.1" aria-label="提高扭矩允许上限">＋</button></div></div>
-              <div class="core-param" data-param="rpm" data-low="0.8" data-high="1.6"><div><span class="parameter-name">刀盘转速</span><strong>1.26 <small>rpm</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.1" aria-label="降低转速允许上限">−</button><span>允许 <b class="range-low">0.8</b>—<b class="range-high">1.6</b></span><button class="range-adjust" data-step="0.1" aria-label="提高转速允许上限">＋</button></div></div>
-              <div class="core-param" data-param="thrust" data-low="26" data-high="38"><div><span class="parameter-name">总推力</span><strong>32.6 <small>MN</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-1" aria-label="降低总推力允许上限">−</button><span>允许 <b class="range-low">26</b>—<b class="range-high">38</b></span><button class="range-adjust" data-step="1" aria-label="提高总推力允许上限">＋</button></div></div>
-              <div class="core-param" data-param="oil" data-low="12.5" data-high="16.0"><div><span class="parameter-name">分区油压</span><strong>13.8—15.2 <small>MPa</small></strong></div><div class="range-editor"><button class="range-adjust" data-step="-0.5" aria-label="降低油压允许上限">−</button><span>允许 <b class="range-low">12.5</b>—<b class="range-high">16.0</b></span><button class="range-adjust" data-step="0.5" aria-label="提高油压允许上限">＋</button></div></div>
-            </div>
+            <section class="param-theme cutter-theme"><div class="theme-title">刀盘</div>
+              <div class="machine-param-row"><div><span>扭矩</span><strong>5,260 <small>kN·m</small></strong></div><div class="dual-range" data-label="刀盘扭矩" data-unit="kN·m"><div class="range-caption">允许目标范围 <b class="range-output">3,500—5,800</b></div><div class="range-track"><i></i><input class="range-thumb range-low-input" type="range" min="2000" max="7000" step="100" value="3500" aria-label="扭矩允许范围下限"><input class="range-thumb range-high-input" type="range" min="2000" max="7000" step="100" value="5800" aria-label="扭矩允许范围上限"></div></div></div>
+              <div class="machine-param-row"><div><span>转速</span><strong>1.26 <small>rpm</small></strong></div><div class="dual-range" data-label="刀盘转速" data-unit="rpm"><div class="range-caption">允许目标范围 <b class="range-output">0.8—1.6</b></div><div class="range-track"><i></i><input class="range-thumb range-low-input" type="range" min="0.3" max="2.5" step="0.1" value="0.8" aria-label="转速允许范围下限"><input class="range-thumb range-high-input" type="range" min="0.3" max="2.5" step="0.1" value="1.6" aria-label="转速允许范围上限"></div></div></div>
+            </section>
 
-            <div class="pressure-block">
+            <section class="param-theme thrust-theme"><div class="theme-title">推进</div>
+              <div class="machine-param-row"><div><span>总推力</span><strong>32,600 <small>kN</small></strong></div><div class="dual-range" data-label="总推力" data-unit="kN"><div class="range-caption">允许目标范围 <b class="range-output">26,000—38,000</b></div><div class="range-track"><i></i><input class="range-thumb range-low-input" type="range" min="15000" max="45000" step="500" value="26000" aria-label="总推力允许范围下限"><input class="range-thumb range-high-input" type="range" min="15000" max="45000" step="500" value="38000" aria-label="总推力允许范围上限"></div></div></div>
+              <div class="oil-zones"><span>分区油压</span><b>U 14.2</b><b>D 15.2</b><b>L 13.8</b><b>R 14.6</b><small>MPa</small></div>
+              <div class="oil-limits"><div><span>最小允许油压</span><div class="spin-control" data-step="0.5" data-min="8" data-max="18"><button class="spin-minus">−</button><b>12.5</b><button class="spin-plus">＋</button></div></div><div><span>最大允许油压差</span><div class="spin-control" data-step="0.1" data-min="0.2" data-max="3"><button class="spin-minus">−</button><b>1.5</b><button class="spin-plus">＋</button></div></div></div>
+            </section>
+
+            <section class="pressure-block pressure-theme">
               <div class="pressure-head"><span>切口压力 <i class="tag">自动控制</i></span><strong>2.82 <small>bar</small></strong></div>
               <canvas id="pressureCanvas" aria-label="切口压力实时曲线、目标值与允许区间"></canvas>
               <div class="pressure-legend"><span>实时压力</span><span>目标 2.85</span><span>允许 2.60—3.10</span></div>
-            </div>
+            </section>
 
-            <div class="material-list">
+            <section class="material-list"><div class="theme-title material-title">耗材</div>
               <div class="material-progress" id="groutParameter"><div><span>同步注浆</span><strong><span id="groutValue">4.2</span> / <span id="groutTarget">6.5</span> m³</strong></div><div class="progress-track"><i id="groutFill" style="width:64%"></i></div><small id="groutGoalLabel">目标完成 64%</small></div>
               <div class="material-progress"><div><span>尾部油脂</span><strong>12.6 / 18.0 kg</strong></div><div class="progress-track grease"><i style="width:70%"></i></div><small>目标完成 70%</small></div>
-            </div>
+            </section>
           </article>
         </div>
       </section>
@@ -534,7 +662,7 @@
           <div class="canvas-wrap"><canvas id="tunnelCanvas" aria-label="隧道纵断面与前方环境"></canvas></div>
           <div class="tunnel-overlay">
             <div class="tunnel-top">
-              <div><div class="view-title" id="sceneTitle">前方环境 · 线路地层剖面</div><div class="view-sub" id="sceneSub">预测范围 0—60 m · 显示沿线路的地层变化与邻近设施</div><div class="scene-tabs" role="tablist"><button class="scene-tab active" data-scene="section">线路剖面</button><button class="scene-tab" data-scene="drive">掘进视角</button></div></div>
+              <div><div class="scene-tabs" role="tablist"><button class="scene-tab active" data-scene="section">线路视角</button><button class="scene-tab" data-scene="drive">掘进视角</button></div></div>
               <button class="risk-pill" id="riskPill">△ 前方 38 m · 富水砂层</button>
             </div>
             <div class="tunnel-legend"><span class="legend-item design">设计轴线</span><span class="legend-item actual">实际轨迹</span><span class="legend-item ring">已拼装环</span></div>
@@ -543,11 +671,11 @@
 
         <div class="intel-row">
           <article class="card goal-card goal-card-v2" id="goalCard">
-            <div class="goal-header"><div><div class="card-title">第 356 环 · 阶段控制目标</div><div class="view-sub">当前值 / 本环目标 · 自动策略 A-17</div></div><span class="tag" id="goalStatusText">自动执行中</span></div>
-            <div class="target-groups">
-              <section class="target-group"><div class="target-group-head"><strong>姿态</strong><span>完成率 <b>78%</b></span></div><div class="target-values"><span>切口水平 <b>+12 / +5</b></span><span>切口高程 <b>−8 / −3</b></span><span>盾尾水平 <b>+8 / +3</b></span><span>盾尾高程 <b>−6 / −2</b></span></div><div class="completion"><i style="width:78%"></i></div></section>
-              <section class="target-group"><div class="target-group-head"><strong>沉降</strong><span>完成率 <b>72%</b></span></div><div class="target-values"><span>切口前 5m <b>−3.2 mm</b></span><span>切口前 10m <b>−1.8 mm</b></span><span>盾尾上方 <b>−4.6 mm</b></span><span>盾尾后方 <b>−3.9 mm</b></span></div><div class="completion amber"><i style="width:72%"></i></div></section>
-              <section class="target-group"><div class="target-group-head"><strong>管片</strong><span>完成率 <b>91%</b></span></div><div class="target-values two"><span>水平位置 <b>+2 / 0 mm</b></span><span>高程位置 <b>−3 / 0 mm</b></span></div><div class="completion green"><i style="width:91%"></i></div></section>
+            <div class="goal-header"><div><div class="card-title">阶段目标</div></div><span class="tag" id="goalStatusText">自动执行中</span></div>
+            <div class="target-groups stage-v3">
+              <section class="stage-block pose-stage"><div class="stage-head"><strong>姿态 <i>主控切口</i></strong><span>合格率 <b>92%</b></span></div><div class="stage-values four"><span>切口水平 <b>+5 mm</b></span><span>切口高程 <b>−3 mm</b></span><span>盾尾水平 <b>+3 mm</b></span><span>盾尾高程 <b>−2 mm</b></span></div></section>
+              <section class="stage-block"><div class="stage-head"><strong>沉降</strong><span>合格率 <b>88%</b></span></div><div class="stage-values two"><span>单日沉降控制量 <b>≤ 3.0 mm</b></span><span>整体控制沉降值 <b>−15—+5 mm</b></span></div></section>
+              <section class="stage-block assembly-stage"><div class="stage-head"><strong>拼装</strong><span>合格率 <b>96%</b></span></div><div class="assembly-ranges"><div class="dual-range compact" data-label="管片水平偏差" data-unit="mm"><div class="range-caption">水平偏差目标范围 <b class="range-output">−5—+5</b></div><div class="range-track"><i></i><input class="range-thumb range-low-input" type="range" min="-20" max="20" step="1" value="-5" aria-label="水平偏差目标下限"><input class="range-thumb range-high-input" type="range" min="-20" max="20" step="1" value="5" aria-label="水平偏差目标上限"></div></div><div class="dual-range compact" data-label="管片高程偏差" data-unit="mm"><div class="range-caption">高程偏差目标范围 <b class="range-output">−6—+4</b></div><div class="range-track"><i></i><input class="range-thumb range-low-input" type="range" min="-20" max="20" step="1" value="-6" aria-label="高程偏差目标下限"><input class="range-thumb range-high-input" type="range" min="-20" max="20" step="1" value="4" aria-label="高程偏差目标上限"></div></div></div></section>
             </div>
             <span id="goalGrout" hidden>6.5</span><span id="groutGoalItem" hidden></span>
           </article>
@@ -565,7 +693,7 @@
           <button class="dock-button" data-dock="生产数据"><span class="dock-icon">▥</span><span>数据</span></button>
           <button class="dock-button" data-dock="工程资料"><span class="dock-icon">▧</span><span>资料</span></button>
           <button class="dock-button" data-dock="报警中心"><span class="dock-icon">△</span><span>报警</span><i class="badge">2</i></button>
-          <button class="dock-button" data-dock="交接班"><span class="dock-icon">◒</span><span>交接班</span></button>
+          <button class="dock-button" data-dock="近期事项"><span class="dock-icon">◒</span><span>事项</span></button>
         </nav>
       </section>
     </main>
@@ -617,6 +745,9 @@
       }
       setClock();
       setInterval(setClock, 1000);
+      window.setBoringState = function(status){
+        var map={推进:'driving',拼装:'assembling',停机:'stopped'},el=$('.state-current');if(!map[status])return;el.textContent=status;el.className='state-current '+map[status];
+      };
 
       function resizeCanvas(canvas, draw) {
         var rect = canvas.getBoundingClientRect();
@@ -1089,7 +1220,7 @@
 
       function drawLongitudinalSection(ctx,w,h){
         ctx.clearRect(0,0,w,h);drawGroundBase(ctx,w,h,true);
-        var startX=w*.055,tailX=w*.54,cutterX=w*.67,riskX=w*.83;
+        var startX=0,tailX=w*.54,cutterX=w*.67,riskX=w*.83;
         function cy(x){var t=(x-startX)/(cutterX-startX);return h*(.72-.09*t+.018*Math.sin(t*Math.PI));}
         function path(from,to){ctx.beginPath();ctx.moveTo(from,cy(from));for(var x=from+6;x<=to;x+=6)ctx.lineTo(x,cy(x));}
         var d=Math.max(36,Math.min(48,h*.18));
@@ -1106,7 +1237,7 @@
         [tailX,tailX+(cutterX-tailX)*.43,tailX+(cutterX-tailX)*.78].forEach(function(rx,ri){var ry=cy(rx);ctx.strokeStyle=ri===0?'#3f301a':'rgba(73,47,10,.55)';ctx.lineWidth=ri===0?4:2;ctx.beginPath();ctx.moveTo(rx,ry-d*.5);ctx.lineTo(rx,ry+d*.5);ctx.stroke();});
         var headY=cy(cutterX);
 
-        path(startX,cutterX);ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#eef4f3';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(startX,cy(startX)+5);for(var ax=startX+8;ax<=cutterX;ax+=8)ctx.lineTo(ax,cy(ax)+4+Math.sin(ax*.025));ctx.stroke();
+        path(startX,w*.93);ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#eef4f3';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(startX,cy(startX)+5);for(var ax=startX+8;ax<=w*.90;ax+=8)ctx.lineTo(ax,cy(ax)+4+Math.sin(ax*.025));ctx.stroke();
 
         /* Sealed cutterhead closes the shield face and sits above the axis overlays. */
         var cutterFace=ctx.createLinearGradient(cutterX-10,0,cutterX+10,0);cutterFace.addColorStop(0,'#5a2f20');cutterFace.addColorStop(.34,'#c06d42');cutterFace.addColorStop(.62,'#8d482e');cutterFace.addColorStop(1,'#3a2019');
@@ -1118,39 +1249,38 @@
         ctx.fillStyle='#f2aa63';for(var tool=0;tool<14;tool++){var ta=tool*Math.PI/7;var tr=tool%2?1:.64;var tx=cutterX+Math.cos(ta)*7.2*tr;var ty=headY+Math.sin(ta)*d*.46*tr;ctx.fillRect(tx-1.2,ty-1.4,2.4,2.8);}
         ctx.fillStyle='#241817';ctx.strokeStyle='#e69a55';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(cutterX,headY,2.1,d*.095,0,0,Math.PI*2);ctx.fill();ctx.stroke();
 
-        /* The 38 m change is a vertical station, clickable through the pill. */
-        ctx.fillStyle='rgba(53,144,165,.28)';ctx.fillRect(riskX-w*.018,h*.51,w*.036,h*.17);
-        ctx.strokeStyle='rgba(111,196,213,.58)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(riskX,h*.2);ctx.lineTo(riskX,h*.88);ctx.stroke();ctx.setLineDash([]);
-        ctx.fillStyle='#ffc857';ctx.font='600 10px sans-serif';ctx.textAlign='center';ctx.fillText('前方 38 m',riskX,h*.37);
-        ctx.fillStyle='rgba(10,15,17,.78)';ctx.fillRect(w*.5,h*.25,w*.17,22);ctx.fillStyle='#dce5e3';ctx.textAlign='left';ctx.fillText('掘进方向  →',w*.515,h*.25+15);
+        /* Subtle station line marks the future geology change without a label box. */
+        ctx.strokeStyle='rgba(111,196,213,.38)';ctx.lineWidth=1;ctx.setLineDash([4,6]);ctx.beginPath();ctx.moveTo(riskX,h*.32);ctx.lineTo(riskX,h*.84);ctx.stroke();ctx.setLineDash([]);
       }
 
       function drawExcavationPerspective(ctx,w,h,atRisk){
         ctx.clearRect(0,0,w,h);
         var layers=atRisk?
-          [{y:0,h:.14,c:'#26353a',n:''},{y:.14,h:.15,c:'#435641',n:'① 杂填土'},{y:.29,h:.16,c:'#684748',n:'② 粉质黏土'},{y:.45,h:.25,c:'#35687a',n:'③ 富水砂层（当前断面）'},{y:.70,h:.22,c:'#5a503d',n:'④ 粉细砂'}]:
-          [{y:0,h:.14,c:'#26353a',n:''},{y:.14,h:.15,c:'#455742',n:'① 杂填土'},{y:.29,h:.16,c:'#674849',n:'② 粉质黏土'},{y:.45,h:.18,c:'#386878',n:'③ 富水砂层'},{y:.63,h:.27,c:'#5b513e',n:'④ 粉细砂（当前掘进层）'}];
+          [{y:0,h:.20,c:'#26353a',n:''},{y:.20,h:.14,c:'#435641',n:'① 杂填土'},{y:.34,h:.15,c:'#684748',n:'② 粉质黏土'},{y:.49,h:.24,c:'#35687a',n:'③ 富水砂层（当前断面）'},{y:.73,h:.27,c:'#5a503d',n:'④ 粉细砂'}]:
+          [{y:0,h:.20,c:'#26353a',n:''},{y:.20,h:.14,c:'#455742',n:'① 杂填土'},{y:.34,h:.15,c:'#674849',n:'② 粉质黏土'},{y:.49,h:.18,c:'#386878',n:'③ 富水砂层'},{y:.67,h:.33,c:'#5b513e',n:'④ 粉细砂（当前掘进层）'}];
         layers.forEach(function(l){ctx.fillStyle=l.c;ctx.fillRect(0,h*l.y,w,h*l.h+1);if(l.n){ctx.fillStyle='rgba(224,233,230,.68)';ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText(l.n,w*.035,h*(l.y+l.h*.55));}});
-        if(atRisk){ctx.strokeStyle='rgba(126,203,222,.34)';ctx.lineWidth=1;for(var hatch=-5;hatch<22;hatch++){ctx.beginPath();ctx.moveTo(hatch*52,h*.70);ctx.lineTo(hatch*52+95,h*.45);ctx.stroke();}}
+        if(atRisk){ctx.strokeStyle='rgba(126,203,222,.34)';ctx.lineWidth=1;for(var hatch=-5;hatch<22;hatch++){ctx.beginPath();ctx.moveTo(hatch*52,h*.73);ctx.lineTo(hatch*52+95,h*.49);ctx.stroke();}}
 
         /* Surface environment: rectangles are buildings, circles are utilities. */
-        ctx.fillStyle='#6f8994';[[.18,.055,.045,.085],[.34,.08,.035,.06],[.72,.045,.05,.095],[.84,.075,.035,.065]].forEach(function(b){ctx.fillRect(w*b[0],h*b[1],w*b[2],h*b[3]);ctx.strokeStyle='#9bb1ba';ctx.lineWidth=1;ctx.strokeRect(w*b[0],h*b[1],w*b[2],h*b[3]);});
-        [[.28,.22],[.69,.22]].forEach(function(p){ctx.fillStyle='#1c2430';ctx.strokeStyle='#9fb1bd';ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*p[0],h*p[1],6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#7789a9';ctx.beginPath();ctx.arc(w*p[0],h*p[1],2,0,Math.PI*2);ctx.fill();});
+        ctx.fillStyle='#6f8994';[[.18,.035,.045,.165],[.34,.075,.035,.125],[.72,.025,.05,.175],[.84,.07,.035,.13]].forEach(function(b){ctx.fillRect(w*b[0],h*b[1],w*b[2],h*b[3]);ctx.strokeStyle='#9bb1ba';ctx.lineWidth=1;ctx.strokeRect(w*b[0],h*b[1],w*b[2],h*b[3]);});
+        [[.28,.27],[.69,.27]].forEach(function(p){ctx.fillStyle='#1c2430';ctx.strokeStyle='#9fb1bd';ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*p[0],h*p[1],6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#7789a9';ctx.beginPath();ctx.arc(w*p[0],h*p[1],2,0,Math.PI*2);ctx.fill();});
 
-        /* Large tunnel portal and concentric installed rings follow the reference. */
-        var cx=w*.52,cy=h*.79,portalR=Math.min(w*.27,h*.66);
-        ctx.fillStyle='#090f17';ctx.beginPath();ctx.arc(cx,cy,portalR,0,Math.PI*2);ctx.fill();
-        [1,.84,.69,.55,.43,.32].forEach(function(scale,index){ctx.strokeStyle=index>3?'rgba(151,221,174,.72)':'rgba(93,139,112,.48)';ctx.lineWidth=index>3?3:4;ctx.beginPath();ctx.arc(cx,cy,portalR*scale,0,Math.PI*2);ctx.stroke();});
+        /* The tunnel is limited to the outer installed ring: translucent grey, no black portal. */
+        var cx=w*.52,cy=h*.79,portalR=Math.min(w*.23,h*.58),liningR=portalR*.78;
+        var liningFill=ctx.createRadialGradient(cx-liningR*.18,cy-liningR*.22,liningR*.08,cx,cy,liningR);
+        liningFill.addColorStop(0,'rgba(183,195,200,.34)');liningFill.addColorStop(.72,'rgba(119,132,139,.25)');liningFill.addColorStop(1,'rgba(82,94,101,.16)');
+        ctx.fillStyle=liningFill;ctx.beginPath();ctx.arc(cx,cy,liningR,0,Math.PI*2);ctx.fill();
+        [1,.78,.60,.43].forEach(function(scale,index){ctx.strokeStyle=index<2?'rgba(111,165,132,.62)':'rgba(158,224,179,.80)';ctx.lineWidth=index<2?3.2:2.6;ctx.beginPath();ctx.arc(cx,cy,liningR*scale,0,Math.PI*2);ctx.stroke();});
 
         /* Forward corridor and the 38 m geology station. */
-        var vanY=h*.38;ctx.fillStyle=atRisk?'rgba(76,164,184,.20)':'rgba(61,126,151,.15)';ctx.beginPath();ctx.moveTo(cx-w*.018,vanY);ctx.lineTo(cx+w*.018,vanY);ctx.lineTo(cx+portalR*.27,cy);ctx.lineTo(cx-portalR*.27,cy);ctx.closePath();ctx.fill();
+        var vanY=h*.38;ctx.fillStyle=atRisk?'rgba(76,164,184,.20)':'rgba(61,126,151,.15)';ctx.beginPath();ctx.moveTo(cx-w*.018,vanY);ctx.lineTo(cx+w*.018,vanY);ctx.lineTo(cx+liningR*.36,cy);ctx.lineTo(cx-liningR*.36,cy);ctx.closePath();ctx.fill();
         ctx.strokeStyle='#29a7ff';ctx.lineWidth=1.7;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(cx,h);ctx.lineTo(cx,vanY);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#eef3f5';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(cx-8,h);ctx.quadraticCurveTo(cx-3,h*.67,cx+1,vanY);ctx.stroke();
         ctx.strokeStyle='rgba(154,177,188,.6)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(cx-w*.035,vanY+h*.02);ctx.lineTo(cx+w*.035,vanY+h*.02);ctx.lineTo(cx+w*.055,vanY+h*.10);ctx.lineTo(cx-w*.055,vanY+h*.10);ctx.closePath();ctx.stroke();ctx.setLineDash([]);
         ctx.fillStyle=atRisk?'rgba(72,171,194,.42)':'rgba(72,147,171,.28)';ctx.fillRect(cx-w*.052,vanY+h*.065,w*.104,h*.022);
-        ctx.fillStyle='#ffc857';ctx.font='600 10px sans-serif';ctx.textAlign='left';ctx.fillText(atRisk?'K12+383.8 · 富水砂层断面':'38 m · 进入富水砂层',cx+w*.065,vanY+h*.09);
+        ctx.fillStyle='#ffc857';ctx.font='600 8px sans-serif';ctx.textAlign='left';ctx.fillText(atRisk?'K12+383.8 · 富水砂层断面':'38 m · 进入富水砂层',cx+w*.065,vanY+h*.09);
 
         /* Smaller shield-machine face on the common alignment. */
-        var mr=Math.min(portalR*.22,h*.14);var machine=ctx.createRadialGradient(cx-mr*.28,cy-mr*.3,2,cx,cy,mr);machine.addColorStop(0,'#8997aa');machine.addColorStop(.72,'#4d5969');machine.addColorStop(1,'#222b37');ctx.fillStyle=machine;ctx.strokeStyle='#aab7c8';ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,mr,0,Math.PI*2);ctx.fill();ctx.stroke();
+        var mr=Math.min(liningR*.31,h*.13);var machine=ctx.createRadialGradient(cx-mr*.28,cy-mr*.3,2,cx,cy,mr);machine.addColorStop(0,'#8997aa');machine.addColorStop(.72,'#4d5969');machine.addColorStop(1,'#222b37');ctx.fillStyle=machine;ctx.strokeStyle='#aab7c8';ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,mr,0,Math.PI*2);ctx.fill();ctx.stroke();
         ctx.strokeStyle='#cbd4df';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-mr*.48,cy);ctx.lineTo(cx+mr*.48,cy);ctx.moveTo(cx,cy-mr*.48);ctx.lineTo(cx,cy+mr*.48);ctx.stroke();ctx.fillStyle='#e1e8ef';ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fill();
         ctx.fillStyle='rgba(9,14,20,.76)';ctx.fillRect(w*.25,h*.76,w*.18,36);ctx.fillStyle='#dce5ea';ctx.font='600 9px sans-serif';ctx.fillText(atRisk?'前方盾构姿态预测':'盾构机 · 第 356 环',w*.265,h*.76+14);ctx.fillStyle='#8999a8';ctx.font='8px sans-serif';ctx.fillText(atRisk?'预计垂直 +5 mm / 水平 −2 mm':'垂直 −8 mm / 水平 +12 mm',w*.265,h*.76+27);
       }
@@ -1173,20 +1303,20 @@
       }
 
       function drawTrend(ctx,w,h){
-        ctx.clearRect(0,0,w,h);var p={l:28,r:9,t:14,b:24};var attitude=[-6,-9,-8,-10,-6,-4,-2,0,1,1,5,7,8,8,6,8,9,10,10];var settlement=[-1.2,-1.5,-1.8,-2.4,-3.1,-3.8,-4.4,-4.8,-4.5,-4.2,-4.0,-3.8,-3.7,-3.6,-3.5,-3.4,-3.3,-3.2,-3.1];var data=state.trend==='attitude'?attitude:settlement;var min=state.trend==='attitude'?-15:-8,max=state.trend==='attitude'?15:1;
+        ctx.clearRect(0,0,w,h);var p={l:34,r:16,t:18,b:26};var attitude=[-6,-9,-8,-4,0,5,8,10];var settlement=[-1.2,-1.5,-1.8,-2.1,-2.5,-2.9,-3.2,-3.6,-4.0,-4.4,-4.8,-5.1,-5.4,-5.7,-6.0,-6.2,-6.4,-6.6,-6.8,-7.0,-7.1];var data=state.trend==='attitude'?attitude:settlement;var min=state.trend==='attitude'?-15:-10,max=state.trend==='attitude'?15:1;var startRing=state.trend==='attitude'?354:350;
         function px(i){return p.l+(w-p.l-p.r)*i/(data.length-1);}function py(v){return p.t+(h-p.t-p.b)*(max-v)/(max-min);}
-        ctx.strokeStyle='rgba(170,195,220,.15)';ctx.lineWidth=1;var ticks=state.trend==='attitude'?[-15,-10,-5,0,5,10,15]:[-8,-6,-4,-2,0];ctx.font='8px sans-serif';ctx.fillStyle='#6f7f8e';ctx.textAlign='right';ticks.forEach(function(t){ctx.beginPath();ctx.moveTo(p.l,py(t));ctx.lineTo(w-p.r,py(t));ctx.stroke();ctx.fillText(t,p.l-5,py(t)+3);});
+        ctx.strokeStyle='rgba(170,195,220,.15)';ctx.lineWidth=1;var ticks=state.trend==='attitude'?[-15,-10,-5,0,5,10,15]:[-10,-8,-6,-4,-2,0];ctx.font='8px sans-serif';ctx.fillStyle='#6f7f8e';ctx.textAlign='right';ticks.forEach(function(t){ctx.beginPath();ctx.moveTo(p.l,py(t));ctx.lineTo(w-p.r,py(t));ctx.stroke();ctx.fillText(t,p.l-5,py(t)+3);});
         if(state.trend==='attitude'){
-          ctx.fillStyle='rgba(83,116,204,.32)';ctx.beginPath();ctx.moveTo(px(0),py(0));data.forEach(function(v,i){ctx.lineTo(px(i),py(v));});ctx.lineTo(px(data.length-1),py(0));ctx.closePath();ctx.fill();
-          ctx.strokeStyle='#7898ed';ctx.lineWidth=2;ctx.beginPath();data.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
-          ctx.strokeStyle='rgba(210,220,230,.55)';ctx.setLineDash([3,3]);[-12,12].forEach(function(v){ctx.beginPath();ctx.moveTo(p.l,py(v));ctx.lineTo(w-p.r,py(v));ctx.stroke();});ctx.setLineDash([]);
-          data.forEach(function(v,i){var x=px(i),y=py(v),pred=i>15;ctx.fillStyle=pred?'#6f88c8':'#79b83f';ctx.beginPath();ctx.moveTo(x-6,y-4);ctx.lineTo(x+2,y-4);ctx.lineTo(x+2,y-8);ctx.lineTo(x+8,y);ctx.lineTo(x+2,y+8);ctx.lineTo(x+2,y+4);ctx.lineTo(x-6,y+4);ctx.closePath();ctx.fill();});
+          var area=ctx.createLinearGradient(0,p.t,0,h-p.b);area.addColorStop(0,'rgba(101,117,190,.46)');area.addColorStop(1,'rgba(66,79,145,.18)');ctx.fillStyle=area;ctx.beginPath();ctx.moveTo(px(0),py(0));data.forEach(function(v,i){ctx.lineTo(px(i),py(v));});ctx.lineTo(px(data.length-1),py(0));ctx.closePath();ctx.fill();
+          ctx.strokeStyle='#7d8fd6';ctx.lineWidth=2.2;ctx.beginPath();data.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
+          ctx.strokeStyle='rgba(210,220,230,.52)';ctx.setLineDash([4,4]);[-12,12].forEach(function(v){ctx.beginPath();ctx.moveTo(p.l,py(v));ctx.lineTo(w-p.r,py(v));ctx.stroke();});ctx.setLineDash([]);
+          data.forEach(function(v,i){var x=px(i),y=py(v),pred=i>=3;ctx.fillStyle=pred?'#7788cf':'#8eb84a';ctx.beginPath();ctx.moveTo(x-7,y-5);ctx.lineTo(x+1,y-5);ctx.lineTo(x+1,y-9);ctx.lineTo(x+9,y);ctx.lineTo(x+1,y+9);ctx.lineTo(x+1,y+5);ctx.lineTo(x-7,y+5);ctx.closePath();ctx.fill();});
         }else{
-          ctx.fillStyle='rgba(41,167,255,.12)';ctx.beginPath();data.forEach(function(v,i){var y=py(v+1.1);if(i===0)ctx.moveTo(px(i),y);else ctx.lineTo(px(i),y);});for(var i=data.length-1;i>=0;i--)ctx.lineTo(px(i),py(data[i]-1.1));ctx.closePath();ctx.fill();
+          ctx.fillStyle='rgba(41,167,255,.12)';ctx.beginPath();data.forEach(function(v,i){var y=py(v+.8);if(i===0)ctx.moveTo(px(i),y);else ctx.lineTo(px(i),y);});for(var i=data.length-1;i>=0;i--)ctx.lineTo(px(i),py(data[i]-.8));ctx.closePath();ctx.fill();
           ctx.strokeStyle='#29a7ff';ctx.lineWidth=2;ctx.beginPath();data.forEach(function(v,i){if(i===0)ctx.moveTo(px(i),py(v));else ctx.lineTo(px(i),py(v));});ctx.stroke();
-          ctx.strokeStyle='rgba(255,255,255,.48)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(p.l,py(-5));ctx.lineTo(w-p.r,py(-5));ctx.stroke();ctx.setLineDash([]);
+          ctx.strokeStyle='rgba(255,255,255,.48)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(p.l,py(-8));ctx.lineTo(w-p.r,py(-8));ctx.stroke();ctx.setLineDash([]);
         }
-        ctx.fillStyle='#70808f';ctx.font='8px sans-serif';ctx.textAlign='center';for(var label=0;label<data.length;label+=3)ctx.fillText(String(338+label),px(label),h-7);
+        ctx.fillStyle='#70808f';ctx.font='8px sans-serif';ctx.textAlign='center';var labelStep=state.trend==='attitude'?1:4;for(var label=0;label<data.length;label+=labelStep)ctx.fillText(String(startRing+label),px(label),h-7);
         ctx.fillStyle='#98a7b4';ctx.textAlign='left';ctx.fillText(state.trend==='attitude'?'轴线变化值 / mm':'沉降值 / mm',p.l,9);
       }
 
@@ -1199,12 +1329,10 @@
 
       function updateScene(scene){
         state.scene=scene;
-        var titles={section:'前方环境 · 线路地层剖面',drive:'前方环境 · 掘进视角',risk:'前方 38 m · 掘进视角'};
-        var subs={section:'预测范围 0—60 m · 显示沿线路的地层变化与邻近设施',drive:'当前掘进环境 · 地层、建筑与地下管线实时融合',risk:'K12+383.8 · 已根据富水砂层及邻近环境更新预测场景'};
-        $('#sceneTitle').textContent=titles[scene];$('#sceneSub').textContent=subs[scene];
         $('#riskPill').textContent=scene==='risk'?'← 返回前方环境':'△ 前方 38 m · 富水砂层';
         $$('.scene-tab').forEach(function(btn){btn.classList.toggle('active',(scene==='risk'?state.previousScene:scene)===btn.dataset.scene);});
-        $('.tunnel-legend').style.display=scene==='risk'?'none':'flex';
+        var sceneCard=$('.tunnel-card');sceneCard.classList.toggle('scene-drive',scene==='drive');sceneCard.classList.toggle('scene-risk',scene==='risk');
+        $('.tunnel-legend').style.display='flex';
         resizeCanvas($('#tunnelCanvas'),drawTunnel);
       }
       $$('.scene-tab').forEach(function(btn){btn.addEventListener('click',function(){state.previousScene=btn.dataset.scene;updateScene(btn.dataset.scene);});});
@@ -1267,6 +1395,20 @@
         });
       });
 
+      function formatRangeNumber(value,input){
+        var n=Number(value),step=Number(input.step||1),signed=Number(input.min)<0&&n>0;
+        var text=step<1?n.toFixed(1):Math.round(n).toLocaleString('zh-CN');return signed?'+'+text:text;
+      }
+      function syncDualRange(control,changed){
+        var low=control.querySelector('.range-low-input'),high=control.querySelector('.range-high-input'),step=Number(low.step||1);
+        if(Number(low.value)>Number(high.value)-step){if(changed===low)low.value=Number(high.value)-step;else high.value=Number(low.value)+step;}
+        var min=Number(low.min),max=Number(low.max),lowP=(Number(low.value)-min)/(max-min)*100,highP=(Number(high.value)-min)/(max-min)*100;
+        control.querySelector('.range-track i').style.left=lowP+'%';control.querySelector('.range-track i').style.right=(100-highP)+'%';
+        control.querySelector('.range-output').textContent=formatRangeNumber(low.value,low)+'—'+formatRangeNumber(high.value,high);
+      }
+      $$('.dual-range').forEach(function(control){var low=control.querySelector('.range-low-input'),high=control.querySelector('.range-high-input');low.addEventListener('input',function(){syncDualRange(control,low);});high.addEventListener('input',function(){syncDualRange(control,high);});[low,high].forEach(function(input){input.addEventListener('change',function(){toast(control.dataset.label+'范围已暂存',control.querySelector('.range-output').textContent+' '+control.dataset.unit,'↔');});});syncDualRange(control);});
+      $$('.spin-control').forEach(function(control){var valueEl=control.querySelector('b'),step=Number(control.dataset.step),min=Number(control.dataset.min),max=Number(control.dataset.max);function change(dir){var next=Math.max(min,Math.min(max,Number(valueEl.textContent)+dir*step));valueEl.textContent=next.toFixed(step<1?1:0);toast('油压约束已暂存',valueEl.textContent+' MPa','↕');}control.querySelector('.spin-minus').addEventListener('click',function(){change(-1);});control.querySelector('.spin-plus').addEventListener('click',function(){change(1);});});
+
       function showGroutConfirm() {
         openModal('<div class="modal-head"><div><div class="modal-kicker">Karl · 指令复述确认</div><div class="modal-title">修改本环同步注浆目标</div><div class="modal-copy">我理解为：仅将第 356 环注浆量目标提高到 7.0 m³，其余环不变。请确认后下发。</div></div><button class="close-button">×</button></div><div class="comparison"><div class="compare-box"><div class="compare-label">当前目标</div><div class="compare-value">6.5 m³</div></div><div class="compare-arrow">→</div><div class="compare-box new"><div class="compare-label">新目标</div><div class="compare-value">7.0 m³</div></div></div><div class="impact"><div class="impact-row"><span>安全边界检查</span><span>通过</span></div><div class="impact-row"><span>预计填充率</span><span>+4.8%</span></div><div class="impact-row"><span>地层沉降风险</span><span>低</span></div></div><div class="modal-actions"><button class="action-button ghost" id="cancelGrout">取消</button><button class="action-button primary" id="confirmGrout">确认并下发</button></div>');
         $('#cancelGrout').addEventListener('click',closeModal); $('#confirmGrout').addEventListener('click',applyGrout);
@@ -1322,14 +1464,26 @@
         var content={
           '生产数据':'今日累计掘进 8.4 m，完成 7 环；可查看实时参数、环报与班次统计。',
           '工程资料':'可检索地质勘察、线路设计、施工组织、操作规程和历史案例。',
-          '交接班':'当前班次 08:00—16:00，待交接事项 3 项，重要报警均已确认。'
+          '近期事项':'近期共有 6 项事项：2 项待处理、3 项处理中、1 项已完成；可查看报警处置、参数变更和现场记录。'
         };
         openModal('<div class="modal-head"><div><div class="modal-kicker">功能中心</div><div class="modal-title">'+name+'</div><div class="modal-copy">'+content[name]+'</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>数据更新时间</span><span>刚刚</span></div><div class="impact-row"><span>系统状态</span><span>在线</span></div></div><div class="modal-actions"><button class="action-button primary" id="dockClose">完成</button></div>');$('#dockClose').addEventListener('click',closeModal);
       });});
 
-      $('#settingsBtn').addEventListener('click',function(){openModal('<div class="modal-head"><div><div class="modal-kicker">驾驶舱设置</div><div class="modal-title">显示与触控</div><div class="modal-copy">当前为井下深色模式，关键触控热区已按手套操作优化。</div></div><button class="close-button">×</button></div><div class="impact"><div class="impact-row"><span>显示主题</span><span>井下深色</span></div><div class="impact-row"><span>手套模式</span><span>已开启</span></div><div class="impact-row"><span>语音字幕</span><span>始终显示</span></div></div><div class="modal-actions"><button class="action-button primary" id="settingsClose">完成</button></div>');$('#settingsClose').addEventListener('click',closeModal);});
+      $('#settingsBtn').addEventListener('click',function(){
+        var userName=$('#currentUserName').textContent;
+        openModal('<div class="modal-head"><div><div class="modal-kicker">当前用户</div><div class="modal-title">'+userName+'</div><div class="modal-copy">请选择需要进入的功能。</div></div><button class="close-button">×</button></div><div class="reason-grid"><button class="reason-choice" id="systemConfig">系统配置<br><small>项目、数据接入、权限与报警规则</small></button><button class="reason-choice" id="switchUser">用户切换<br><small>使用用户名或工号切换登录账号</small></button></div>');
+        $('#switchUser').addEventListener('click',function(){
+          openModal('<div class="modal-head"><div><div class="modal-kicker">用户管理</div><div class="modal-title">用户切换</div><div class="modal-copy">输入用户名或工号完成身份切换，切换记录将写入系统日志。</div></div><button class="close-button">×</button></div><label class="field-label" for="switchUserInput">用户名 / 工号</label><input class="text-field" id="switchUserInput" value="" placeholder="请输入用户名或刷卡"><label class="field-label" for="switchRole">用户角色</label><select class="text-field" id="switchRole"><option>盾构司机</option><option>管理员</option></select><div class="modal-actions"><button class="action-button ghost" id="cancelUserSwitch">取消</button><button class="action-button primary" id="confirmUserSwitch">确认切换</button></div>');
+          $('#cancelUserSwitch').addEventListener('click',closeModal);
+          $('#confirmUserSwitch').addEventListener('click',function(){var nextUser=$('#switchUserInput').value.trim();if(!nextUser){toast('请输入用户名或工号','也可以使用现场身份卡完成登录','!');return;}$('#currentUserName').textContent=nextUser;$('#settingsBtn').setAttribute('aria-label','当前用户'+nextUser+'，点击进入系统配置或切换用户');closeModal();toast('用户已切换','当前用户：'+nextUser,'♙');});
+        });
+        $('#systemConfig').addEventListener('click',function(){
+          openModal('<div class="modal-head"><div><div class="modal-kicker">系统管理</div><div class="modal-title">系统配置</div><div class="modal-copy">请选择需要维护的配置模块。</div></div><button class="close-button">×</button></div><div class="reason-grid"><button class="reason-choice config-entry" data-config="项目配置">项目配置<br><small>项目名称、线路与环号基准</small></button><button class="reason-choice config-entry" data-config="数据接入">数据接入<br><small>采集链路、PLC与刷新频率</small></button><button class="reason-choice config-entry" data-config="用户权限">用户权限<br><small>角色、班次和操作权限</small></button><button class="reason-choice config-entry" data-config="报警规则">报警规则<br><small>阈值、级别与通知方式</small></button></div><div class="modal-actions"><button class="action-button ghost" id="closeSystemConfig">返回</button></div>');
+          $$('.config-entry').forEach(function(btn){btn.addEventListener('click',function(){toast('进入'+btn.dataset.config,'该配置模块已在原型中打开','→');});});
+          $('#closeSystemConfig').addEventListener('click',closeModal);
+        });
+      });
 
-      setTimeout(function(){ toast('原型演示已就绪','点击 Karl、模式开关、参数调节或底部功能入口体验','K'); },500);
     })();
   </script>
 </body>

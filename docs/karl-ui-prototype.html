@@ -516,6 +516,8 @@
     .intel-row { grid-template-columns:minmax(300px,2fr) minmax(410px,3fr); }
     .goal-card-v2 { padding:15px 18px; }
     .goal-card-v2 .card-title { font-size:15px; }
+    .trend-card .card-title { font-size:15px; }
+    .trend-head { align-items:flex-start; }
     .goal-card-v2 .goal-header { margin-bottom:10px; }
     .stage-v3 { gap:8px; }
     .stage-block { padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(170,195,220,.085); }
@@ -561,6 +563,49 @@
     .speed-reading { gap:8px; }
     .speed-unit { font-size:13px; }
     .pressure-block { padding:9px 11px 7px;grid-template-rows:auto minmax(46px,1fr) auto; }
+
+    /* V6 unified alignment and readability refinement. */
+    .topbar { padding-left:18px;padding-right:18px;gap:18px; }
+    .header-center { grid-template-columns:minmax(260px,1fr) auto;gap:20px; }
+    .project-name { padding-left:0;line-height:1.2; }
+    .run-meta { align-items:center; }
+    .meta-label { line-height:1.1; }
+    .meta-value { line-height:1.2; }
+
+    .left-column { grid-template-rows:140px minmax(0,1fr); }
+    .speed-heading { display:grid;place-content:center;gap:7px;padding:0 16px;border-right:1px solid var(--line); }
+    .speed-heading .eyebrow { font-size:9px;letter-spacing:.12em;text-align:center; }
+    .speed-heading .speed-label { justify-content:center;padding:0;border:0;font-size:18px;font-weight:500; }
+
+    .theme-title { font-size:11px; }
+    .machine-param-row span { font-size:10px; }
+    .machine-param-row small { font-size:9px; }
+    .range-caption { font-size:9px;line-height:1.35; }
+    .oil-zones { font-size:9px; }
+    .oil-zones b { font-size:10px; }
+    .oil-limits span { font-size:9px;line-height:1.25; }
+    .pressure-legend { font-size:9px; }
+    .material-progress > div:first-child { font-size:10px; }
+    .material-progress small { font-size:9px; }
+
+    .tunnel-overlay { padding:18px; }
+    .tunnel-card .risk-pill { right:18px; }
+    .scene-tab { font-size:10px; }
+    .tunnel-legend { gap:14px;font-size:10px; }
+    .pose-legend { gap:5px;line-height:1.5; }
+    .pose-legend span { min-height:17px; }
+
+    .bottombar { padding-left:18px;padding-right:18px; }
+
+    @media (max-width:1280px) {
+      .header-center { grid-template-columns:minmax(220px,1fr) auto;gap:12px; }
+    }
+
+    @media (max-width:920px), (max-height:690px) {
+      .left-column { grid-template-rows:auto; }
+      .topbar { padding-left:12px;padding-right:12px; }
+      .tunnel-card .risk-pill { right:12px; }
+    }
   </style>
 </head>
 <body>
@@ -596,11 +641,9 @@
 
     <main class="main">
       <section class="column left-column" aria-label="掘进实况">
-        <div class="section-head"><span class="eyebrow">掘进实况 · Live drive</span></div>
-
         <article class="card speed-card">
           <div class="speed-primary">
-            <div class="speed-label">推进速度</div>
+            <div class="speed-heading"><span class="eyebrow">掘进实况 · Live drive</span><div class="speed-label">推进速度</div></div>
             <div class="speed-reading"><strong class="speed-number" id="speedValue">23</strong><span class="speed-unit">mm/min</span></div>
           </div>
           <div class="speed-control">
@@ -649,7 +692,7 @@
               <div class="pressure-legend"><span>实时压力</span><span>目标 2.85</span><span>允许 2.60—3.10</span></div>
             </section>
 
-            <section class="material-list"><div class="theme-title material-title">耗材</div>
+            <section class="material-list"><div class="theme-title material-title">材料注入</div>
               <div class="material-progress" id="groutParameter"><div><span>同步注浆</span><strong><span id="groutValue">4.2</span> / <span id="groutTarget">6.5</span> m³</strong></div><div class="progress-track"><i id="groutFill" style="width:64%"></i></div><small id="groutGoalLabel">目标完成 64%</small></div>
               <div class="material-progress"><div><span>尾部油脂</span><strong>12.6 / 18.0 kg</strong></div><div class="progress-track grease"><i style="width:70%"></i></div><small>目标完成 70%</small></div>
             </section>

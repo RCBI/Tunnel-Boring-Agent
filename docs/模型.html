@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>隧道掘进智能体 APP 静态原型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #e8ecf1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 手机模拟器 */
+        .phone {
+            width: 380px;
+            max-width: 100%;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+            padding: 0 0 16px 0;
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 24px 8px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            background: #ffffff;
+        }
+
+        /* 页面容器 */
+        .page-container {
+            min-height: 640px;
+            position: relative;
+            background: #f8fafc;
+            padding-bottom: 70px;
+        }
+
+        .page {
+            display: none;
+            padding: 0 20px 20px 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0.6; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 通用顶部导航 */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 16px 0;
+            border-bottom: 1px solid #e9edf2;
+            margin-bottom: 16px;
+        }
+
+        .nav-header .back {
+            font-size: 20px;
+            font-weight: 500;
+            color: #2563eb;
+            cursor: default;
+        }
+
+        .nav-header .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .nav-header .right-icon {
+            font-size: 20px;
+            color: #64748b;
+            cursor: default;
+        }
+
+        /* 卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 16px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        /* 首页顶部项目卡片 */
+        .project-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .project-card .line1 {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .project-card .line2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 6px 0 4px;
+        }
+
+        .project-card .status {
+            display: inline-block;
+            background: #22c55e;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-top: 6px;
+        }
+
+        /* 功能网格 */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .grid-item {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 18px 8px;
+            text-align: center;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .grid-item .icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .grid-item .label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        /* 列表 */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item .left .main {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .list-item .left .sub {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .list-item .right {
+            font-size: 13px;
+            color: #2563eb;
+        }
+
+        .badge-warning {
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #ffffff;
+            border-top: 1px solid #e9edf2;
+            padding: 8px 0 10px 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .nav-item {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.1s;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .nav-item.active {
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* 控制目标修改页面参数行 */
+        .param-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .param-row:last-child {
+            border-bottom: none;
+        }
+
+        .param-info .name {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .param-info .actual {
+            font-size: 13px;
+            color: #64748b;
+            margin-left: 10px;
+        }
+
+        .param-info .actual.warning {
+            color: #dc2626;
+        }
+
+        .param-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .param-control input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #d1d9e6;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .param-control .unit {
+            font-size: 13px;
+            color: #64748b;
+            margin-right: 4px;
+        }
+
+        .btn-edit {
+            background: #eef2ff;
+            color: #2563eb;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: default;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: default;
+        }
+
+        /* 问答热门标签 */
+        .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0 12px;
+        }
+
+        .tag {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #1e293b;
+        }
+
+        /* 播报Tab */
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e9edf2;
+            padding-bottom: 8px;
+        }
+
+        .tab-item {
+            font-size: 15px;
+            font-weight: 500;
+            color: #94a3b8;
+            padding: 4px 0;
+            cursor: default;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-item.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        /* 播报卡片内的详情按钮 */
+        .detail-btn {
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #475569;
+            cursor: default;
+            display: inline-block;
+        }
+
+        /* 我的页面 */
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item .arrow {
+            color: #94a3b8;
+        }
+
+        .profile-header {
+            text-align: center;
+            padding: 12px 0 20px;
+        }
+
+        .profile-header .avatar {
+            font-size: 56px;
+            margin-bottom: 4px;
+        }
+
+        .profile-header .name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .profile-header .role {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* 辅助 */
+        .mt-8 { margin-top: 8px; }
+        .mb-8 { margin-bottom: 8px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-muted { color: #64748b; font-size: 13px; }
+        .text-sm { font-size: 13px; }
+        .font-bold { font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="phone">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <span>09:41</span>
+        <span>📶 📶 🔋</span>
+    </div>
+
+    <!-- 页面容器 -->
+    <div class="page-container" id="app">
+
+        <!-- ========== 页面1: 首页 ========== -->
+        <div class="page active" id="page-home">
+            <!-- 顶部导航 -->
+            <div class="nav-header" style="border-bottom: none; margin-bottom: 8px;">
+                <span class="back" style="font-size:24px;">☰</span>
+                <span class="title" style="font-size:20px;">隧道掘进智能体</span>
+                <span class="right-icon">🔔</span>
+            </div>
+
+            <!-- 项目卡片 -->
+            <div class="project-card">
+                <div class="line1">当前项目</div>
+                <div class="line2">19号线22标</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                    <span>第 128 环</span>
+                    <span class="status">● 正常掘进中</span>
+                </div>
+            </div>
+
+            <!-- 功能网格 -->
+            <div class="grid-4">
+                <div class="grid-item" onclick="switchPage('page-broadcast')">
+                    <div class="icon">📢</div>
+                    <div class="label">播报</div>
+                </div>
+                <div class="grid-item" onclick="switchPage('page-qa')">
+                    <div class="icon">💬</div>
+                    <div class="label">问答</div>
+                </div>
+                <div class="grid-item" onclick="switchPage('page-control')">
+                    <div class="icon">⚙️</div>
+                    <div class="label">控制目标</div>
+                </div>
+                <div class="grid-item">
+                    <div class="icon">📊</div>
+                    <div class="label">数据</div>
+                </div>
+            </div>
+
+            <!-- 最新播报 -->
+            <div class="card">
+                <div class="flex-between">
+                    <span class="card-title">📌 最新播报</span>
+                    <span class="text-muted" style="font-size:12px;">第128环</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                    <div>
+                        <div style="font-weight:500;">推进压力 12.3 MPa <span style="color:#16a34a;">✓</span></div>
+                        <div style="font-size:13px; color:#64748b;">刀盘扭矩 85% <span style="color:#16a34a;">✓</span></div>
+                    </div>
+                    <span class="badge-success">评价良好</span>
+                </div>
+            </div>
+
+            <!-- 待处理预警 -->
+            <div class="card" style="border-left: 4px solid #dc2626;">
+                <div class="flex-between">
+                    <span class="card-title" style="color:#dc2626;">⚠️ 待处理预警</span>
+                    <span class="badge-warning">1条未读</span>
+                </div>
+                <div style="margin-top:6px; font-weight:500;">注浆压力偏高 15.6 MPa</div>
+                <div style="font-size:13px; color:#64748b;">建议：降低注浆速率</div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="switchPage('page-home')">
+                    <span class="nav-icon">🏠</span>首页
+                </div>
+                <div class="nav-item" onclick="switchPage('page-qa')">
+                    <span class="nav-icon">💬</span>问答
+                </div>
+                <div class="nav-item" onclick="switchPage('page-broadcast')">
+                    <span class="nav-icon">📢</span>播报
+                </div>
+                <div class="nav-item" onclick="switchPage('page-profile')">
+                    <span class="nav-icon">👤</span>我的
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 页面2: 问答 ========== -->
+        <div class="page" id="page-qa">
+            <div class="nav-header">
+                <span class="back" onclick="switchPage('page-home')">←</span>
+                <span class="title">智能问答</span>
+                <span class="right-icon">🎤</span>
+            </div>
+
+            <div class="card" style="padding: 8px 16px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:18px;">🔍</span>
+                    <span style="color:#94a3b8;">输入您的问题...</span>
+                </div>
+            </div>
+
+            <div style="margin-top:8px;">
+                <div class="text-muted" style="margin-bottom:8px;">🔥 热门问题</div>
+                <div class="tag-group">
+                    <span class="tag">当前掘进参数是否正常？</span>
+                    <span class="tag">为什么推进压力偏高？</span>
+                    <span class="tag">第128环控制评价如何？</span>
+                    <span class="tag">当前地质条件适合什么参数？</span>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <div class="text-muted" style="margin-bottom:8px;">📋 历史问答</div>
+                <div class="list-item">
+                    <div class="left">
+                        <div class="main">关于推进压力的调整建议</div>
+                        <div class="sub">07-20 14:30</div>
+                    </div>
+                    <div class="right">查看</div>
+                </div>
+                <div class="list-item">
+                    <div class="left">
+                        <div class="main">第127环掘进总结</div>
+                        <div class="sub">07-20 11:20</div>
+                    </div>
+                    <div class="right">查看</div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="switchPage('page-home')"><span class="nav-icon">🏠</span>首页</div>
+                <div class="nav-item active" onclick="switchPage('page-qa')"><span class="nav-icon">💬</span>问答</div>
+                <div class="nav-item" onclick="switchPage('page-broadcast')"><span class="nav-icon">📢</span>播报</div>
+                <div class="nav-item" onclick="switchPage('page-profile')"><span class="nav-icon">👤</span>我的</div>
+            </div>
+        </div>
+
+        <!-- ========== 页面3: 播报 ========== -->
+        <div class="page" id="page-broadcast">
+            <div class="nav-header">
+                <span class="back" onclick="switchPage('page-home')">←</span>
+                <span class="title">播报记录</span>
+                <span class="right-icon">🔊</span>
+            </div>
+
+            <div class="tab-bar">
+                <span class="tab-item active">环总结</span>
+                <span class="tab-item">安全预警</span>
+                <span class="tab-item">全部</span>
+            </div>
+
+            <!-- 播报列表 -->
+            <div class="card">
+                <div class="flex-between">
+                    <span><span class="font-bold">第128环</span> 掘进完成</span>
+                    <span class="badge-success">良好</span>
+                </div>
+                <div class="text-sm" style="margin-top:6px; color:#1e293b;">
+                    推进压力 12.3/12.0 MPa &nbsp;|&nbsp; 刀盘扭矩 85/80%
+                </div>
+                <div class="text-sm" style="color:#64748b;">螺旋机转速 12.5 r/min</div>
+                <div style="margin-top:10px; display:flex; gap:12px;">
+                    <span class="detail-btn">详情</span>
+                    <span class="detail-btn">🔊 语音</span>
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid #dc2626;">
+                <div class="flex-between">
+                    <span><span class="font-bold" style="color:#dc2626;">⚠️ 第126环</span> 注浆压力异常</span>
+                    <span class="badge-warning">未读</span>
+                </div>
+                <div class="text-sm" style="margin-top:6px;">当前值 15.6 MPa &nbsp; 阈值 12 MPa</div>
+                <div class="text-sm" style="color:#64748b;">建议：降低注浆速率</div>
+                <div style="margin-top:10px; display:flex; gap:12px;">
+                    <span class="detail-btn">已读</span>
+                    <span class="detail-btn">详情</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between">
+                    <span><span class="font-bold">第127环</span> 掘进完成</span>
+                    <span class="badge-success">优秀</span>
+                </div>
+                <div class="text-sm" style="margin-top:6px; color:#1e293b;">
+                    推进压力 11.8/12.0 MPa
+                </div>
+                <div style="margin-top:10px;">
+                    <span class="detail-btn">详情</span>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="switchPage('page-home')"><span class="nav-icon">🏠</span>首页</div>
+                <div class="nav-item" onclick="switchPage('page-qa')"><span class="nav-icon">💬</span>问答</div>
+                <div class="nav-item active" onclick="switchPage('page-broadcast')"><span class="nav-icon">📢</span>播报</div>
+                <div class="nav-item" onclick="switchPage('page-profile')"><span class="nav-icon">👤</span>我的</div>
+            </div>
+        </div>
+
+        <!-- ========== 页面4: 控制目标修改 ========== -->
+        <div class="page" id="page-control">
+            <div class="nav-header">
+                <span class="back" onclick="switchPage('page-home')">←</span>
+                <span class="title">控制策略参数修改</span>
+                <span class="right-icon">📋</span>
+            </div>
+
+            <div style="background:#f1f5f9; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>项目：19号线22标</span>
+                    <span>第 128 环</span>
+                </div>
+            </div>
+
+            <div class="card" style="padding:4px 16px;">
+                <div class="param-row">
+                    <div class="param-info">
+                        <span class="name">推进压力目标</span>
+                        <span class="actual">当前 12.3 MPa</span>
+                    </div>
+                    <div class="param-control">
+                        <input type="text" value="12.0">
+                        <span class="unit">MPa</span>
+                        <span class="btn-edit">修改</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <div class="param-info">
+                        <span class="name">刀盘扭矩上限</span>
+                        <span class="actual">当前 85%</span>
+                    </div>
+                    <div class="param-control">
+                        <input type="text" value="80">
+                        <span class="unit">%</span>
+                        <span class="btn-edit">修改</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <div class="param-info">
+                        <span class="name">螺旋机转速目标</span>
+                        <span class="actual">当前 12.5 r/min</span>
+                    </div>
+                    <div class="param-control">
+                        <input type="text" value="12.0">
+                        <span class="unit">r/min</span>
+                        <span class="btn-edit">修改</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <div class="param-info">
+                        <span class="name">注浆压力上限</span>
+                        <span class="actual warning">当前 15.6 MPa ⚠超限</span>
+                    </div>
+                    <div class="param-control">
+                        <input type="text" value="12.0">
+                        <span class="unit">MPa</span>
+                        <span class="btn-edit">修改</span>
+                    </div>
+                </div>
+                <div class="param-row">
+                    <div class="param-info">
+                        <span class="name">推进速度目标</span>
+                        <span class="actual">当前 48 mm/min</span>
+                    </div>
+                    <div class="param-control">
+                        <input type="text" value="50">
+                        <span class="unit">mm/min</span>
+                        <span class="btn-edit">修改</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary">确认修改</button>
+
+            <div style="margin-top:20px;">
+                <div class="text-muted" style="margin-bottom:6px;">📝 修改历史</div>
+                <div class="text-sm" style="background:#f8fafc; padding:10px 14px; border-radius:12px;">
+                    <div>07-21 09:00 &nbsp; 推进压力 11.5 → 12.0 MPa</div>
+                    <div style="margin-top:4px;">07-20 16:30 &nbsp; 刀盘扭矩 75 → 80%</div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="switchPage('page-home')"><span class="nav-icon">🏠</span>首页</div>
+                <div class="nav-item" onclick="switchPage('page-qa')"><span class="nav-icon">💬</span>问答</div>
+                <div class="nav-item" onclick="switchPage('page-broadcast')"><span class="nav-icon">📢</span>播报</div>
+                <div class="nav-item" onclick="switchPage('page-profile')"><span class="nav-icon">👤</span>我的</div>
+            </div>
+        </div>
+
+        <!-- ========== 页面5: 我的 ========== -->
+        <div class="page" id="page-profile">
+            <div class="nav-header" style="border-bottom: none; margin-bottom:0;">
+                <span class="back" style="visibility:hidden;">←</span>
+                <span class="title">我的</span>
+                <span class="right-icon">⚙️</span>
+            </div>
+
+            <div class="profile-header">
+                <div class="avatar">👤</div>
+                <div class="name">张三</div>
+                <div class="role">盾构机司机 · 19号线22标</div>
+            </div>
+
+            <div class="card" style="padding:0 16px;">
+                <div class="menu-item"><span>📋 我的播报记录</span><span class="arrow">></span></div>
+                <div class="menu-item"><span>❓ 我的问答记录</span><span class="arrow">></span></div>
+                <div class="menu-item"><span>⚙️ 设置</span><span class="arrow">></span></div>
+                <div class="menu-item"><span>📖 使用帮助</span><span class="arrow">></span></div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="switchPage('page-home')"><span class="nav-icon">🏠</span>首页</div>
+                <div class="nav-item" onclick="switchPage('page-qa')"><span class="nav-icon">💬</span>问答</div>
+                <div class="nav-item" onclick="switchPage('page-broadcast')"><span class="nav-icon">📢</span>播报</div>
+                <div class="nav-item active" onclick="switchPage('page-profile')"><span class="nav-icon">👤</span>我的</div>
+            </div>
+        </div>
+
+    </div><!-- end page-container -->
+</div><!-- end phone -->
+
+<script>
+    function switchPage(pageId) {
+        // 隐藏所有页面
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // 显示目标页面
+        document.getElementById(pageId).classList.add('active');
+        // 更新底部导航高亮（简单处理：根据页面id匹配）
+        const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+        // 映射页面id到导航索引
+        const map = {
+            'page-home': 0,
+            'page-qa': 1,
+            'page-broadcast': 2,
+            'page-profile': 3
+        };
+        const idx = map[pageId];
+        if (idx !== undefined) {
+            navItems.forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

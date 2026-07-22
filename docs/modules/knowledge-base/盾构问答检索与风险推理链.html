@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>盾构问答检索与风险推理链</title>
+  <style>
+    :root { color-scheme: light; --ink:#18324a; --muted:#64748b; --line:#bfd4e5; --blue:#e7f3ff; --green:#e9f8ef; --amber:#fff6da; --red:#ffe9e7; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif; color:var(--ink); background:#f5f8fb; }
+    main { max-width:1320px; margin:0 auto; padding:38px 30px 56px; }
+    h1 { margin:0 0 8px; font-size:30px; }
+    .sub { color:var(--muted); margin:0 0 28px; }
+    .flow { display:grid; grid-template-columns:repeat(7,minmax(140px,1fr)); gap:14px; align-items:stretch; }
+    .card { position:relative; min-height:148px; padding:18px; border:1px solid var(--line); border-radius:14px; background:white; box-shadow:0 6px 20px rgba(32,68,99,.07); }
+    .card:not(:last-child)::after { content:"→"; position:absolute; right:-15px; top:58px; z-index:2; font-size:25px; color:#7a9ab5; }
+    .card h2 { margin:0 0 10px; font-size:17px; }
+    .card p { margin:5px 0; color:#455d72; font-size:13px; line-height:1.55; }
+    .blue { background:var(--blue); }
+    .green { background:var(--green); }
+    .amber { background:var(--amber); }
+    .red { background:var(--red); }
+    .sources { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:28px; }
+    .source { padding:20px; border-radius:14px; background:white; border:1px solid var(--line); }
+    .source h3 { margin:0 0 8px; }
+    .source p { margin:6px 0; line-height:1.55; color:#455d72; }
+    .force { border-top:6px solid #c43c35; }
+    .reference { border-top:6px solid #3b82c4; }
+    .conditional { border-top:6px solid #d49318; }
+    .rule { margin-top:24px; padding:18px 22px; border-radius:14px; background:#18324a; color:white; font-weight:650; text-align:center; }
+    @media (max-width:1050px) {
+      .flow { grid-template-columns:1fr 1fr; }
+      .card::after { display:none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>盾构问答逻辑：从“问题分类”走向“可执行风险推理”</h1>
+  <p class="sub">目标不是给问题贴标签，而是确定查找对象、补齐工况、建立证据链并产生可审核的控制候选。</p>
+
+  <section class="flow">
+    <article class="card blue"><h2>1. 问题解析</h2><p>对象：土压、推速、姿态、注浆等</p><p>动作：查询、诊断、调整、处置</p></article>
+    <article class="card blue"><h2>2. 工况补齐</h2><p>环号、地层、设备、工序</p><p>当前值、趋势、报警与历史动作</p></article>
+    <article class="card green"><h2>3. 检索路由</h2><p>规范：强制边界</p><p>案例：相似处置</p><p>论文：机理与判断思路</p></article>
+    <article class="card amber"><h2>4. 风险因果链</h2><p>现象 → 诱因 → 后果</p><p>证据支持与反证</p><p>缺失条件触发追问</p></article>
+    <article class="card red"><h2>5. 硬约束裁决</h2><p>规范、项目规则、设备联锁</p><p>任何越界直接否决</p></article>
+    <article class="card amber"><h2>6. 候选指令</h2><p>原值、新值、变化率、有效范围</p><p>依据、预期影响、回滚条件</p></article>
+    <article class="card green"><h2>7. 闭环执行</h2><p>司机确认 → 下发</p><p>实时监控 → 成功/中止/回滚</p></article>
+  </section>
+
+  <section class="sources">
+    <article class="source force"><h3>国家规范：强制约束</h3><p>提取适用范围、条款号、限值、禁止事项和版本状态。</p><p><strong>作用：</strong>可以否决候选参数。</p></article>
+    <article class="source conditional"><h3>工程案例：条件性经验</h3><p>提取地层、设备、工序、异常、措施、结果和副作用。</p><p><strong>作用：</strong>只有条件相似时才可参考。</p></article>
+    <article class="source reference"><h3>论文：解释性证据</h3><p>提取研究条件、方法、因果假设、结果、局限和适用范围。</p><p><strong>作用：</strong>支持判断思路，不能单独形成强制指令。</p></article>
+  </section>
+
+  <div class="rule">知识库产生候选决策；确定性规则负责安全裁决；司机确认后由执行智能体下发。</div>
+</main>
+</body>
+</html>

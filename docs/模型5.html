@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>隧道智能体 · 个人助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background: #0b0f1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .phone {
+            width: 390px;
+            max-width: 100%;
+            height: 780px;
+            background: #111827;
+            border-radius: 44px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 200px 20px;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-container::-webkit-scrollbar {
+            display: none;
+        }
+        .page {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            animation: fadeSlide 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+        .page.active {
+            display: flex;
+        }
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 通用组件 */
+        .assistant-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 8px 0 16px;
+            flex-shrink: 0;
+        }
+        .avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            flex-shrink: 0;
+        }
+        .assistant-info {
+            flex: 1;
+        }
+        .assistant-info .name {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .assistant-info .status {
+            color: #94a3b8;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-dot 1.8s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+        .context-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #94a3b8;
+            border: 1px solid #1e293b;
+            margin-left: 6px;
+        }
+
+        /* 首页气泡 */
+        .bubble-wrapper {
+            margin: 12px 0;
+        }
+        .bubble {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            border-radius: 20px 20px 20px 4px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            color: #f1f5f9;
+        }
+        .bubble .time {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 6px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .bubble .time .badge {
+            font-size: 10px;
+            background: #6366f120;
+            color: #a5b4fc;
+            padding: 0 10px;
+            border-radius: 30px;
+        }
+        .bubble .title {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bubble .title .tag {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            background: #22c55e20;
+            color: #4ade80;
+            font-weight: 500;
+        }
+        .bubble .title .tag.warn {
+            background: #ef444420;
+            color: #f87171;
+        }
+        .bubble .content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        .bubble .content strong {
+            color: #e2e8f0;
+        }
+        .bubble .extra {
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .bubble .extra .chip {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .bubble .extra .chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .bubble .extra .chip:active {
+            transform: scale(0.96);
+        }
+        .bubble-warning {
+            border-left: 3px solid #f87171;
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .divider-text {
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 24px 0 16px;
+            position: relative;
+        }
+        .divider-text::before,
+        .divider-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 28%;
+            height: 1px;
+            background: #1e293b;
+        }
+        .divider-text::before {
+            left: 0;
+        }
+        .divider-text::after {
+            right: 0;
+        }
+        .suggestions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-bottom: 10px;
+        }
+        .suggestions .pill {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #94a3b8;
+            font-size: 14px;
+            border: 1px solid #1e293b;
+            cursor: default;
+        }
+
+        /* 问答 */
+        #page-qa {
+            padding-bottom: 0;
+            height: 100%;
+        }
+        .qa-chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+        .qa-chat-area::-webkit-scrollbar {
+            display: none;
+        }
+        .msg {
+            max-width: 88%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            animation: fadeSlide 0.2s ease;
+            word-break: break-word;
+        }
+        .msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .msg-assistant {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            color: #e2e8f0;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .msg-assistant .typing-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: blink 1.2s infinite;
+        }
+        .msg-assistant .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .msg-assistant .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blink {
+            0%,
+            60%,
+            100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+        }
+        .qa-quick-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 8px 0 12px;
+            flex-shrink: 0;
+        }
+        .qa-quick-tags .tag {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #94a3b8;
+            border: 1px solid #1e293b;
+            cursor: default;
+        }
+
+        /* 输入栏 —— 多行文本域 */
+        .qa-input-bar {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0 6px;
+            background: transparent;
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: flex-end;
+        }
+        .qa-input-bar textarea {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid #1e293b;
+            background: rgba(255, 255, 255, 0.06);
+            color: #f1f5f9;
+            font-size: 15px;
+            outline: none;
+            resize: vertical;
+            min-height: 48px;
+            max-height: 140px;
+            line-height: 1.5;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            overflow-y: auto;
+        }
+        .qa-input-bar textarea::placeholder {
+            color: #64748b;
+        }
+        .qa-input-bar textarea:focus {
+            border-color: #8b5cf6;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .qa-input-bar textarea:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .qa-input-bar .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px #6366f160;
+            flex-shrink: 0;
+            cursor: default;
+            transition: 0.2s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .qa-input-bar .send-btn:active {
+            transform: scale(0.92);
+        }
+        .qa-input-bar .send-btn.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .qa-input-bar .send-btn .spinner {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        .qa-input-bar .send-btn.loading .spinner {
+            display: block;
+        }
+        .qa-input-bar .send-btn.loading .send-icon {
+            display: none;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 控制 */
+        .control-header {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 600;
+            padding: 8px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .control-header .back {
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .param-group {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 8px 0;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .param-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .param-item:last-child {
+            border-bottom: none;
+        }
+        .param-item .info .label {
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        .param-item .info .current {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .param-item .info .current .highlight {
+            color: #facc15;
+        }
+        .param-item .info .current .danger {
+            color: #f87171;
+        }
+        .param-item .control {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 160px;
+            justify-content: flex-end;
+        }
+        .param-item .control input[type="range"] {
+            width: 120px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 4px;
+            outline: none;
+            flex-shrink: 0;
+        }
+        .param-item .control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8b5cf6;
+            box-shadow: 0 0 24px #8b5cf680;
+            cursor: pointer;
+            border: 2px solid #1e293b;
+        }
+        .param-item .control .value {
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            min-width: 48px;
+            text-align: right;
+        }
+        .param-item .control .unit {
+            color: #64748b;
+            font-size: 13px;
+            min-width: 30px;
+        }
+        .btn-confirm {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 8px 30px #6366f160;
+            cursor: default;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .btn-confirm:active {
+            transform: scale(0.97);
+        }
+        .save-feedback {
+            text-align: center;
+            color: #4ade80;
+            font-size: 14px;
+            margin-top: 8px;
+            height: 24px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .save-feedback.show {
+            opacity: 1;
+        }
+        .history-area {
+            margin-top: 20px;
+            color: #475569;
+            font-size: 13px;
+            text-align: center;
+            border-top: 1px solid #1e293b;
+            padding-top: 16px;
+        }
+
+        /* "我的"页面样式 */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 16px;
+        }
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            align-items: center;
+        }
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+        .profile-row .label {
+            color: #94a3b8;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .profile-row .value {
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-row .value input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 4px 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            width: 140px;
+            outline: none;
+        }
+        .profile-row .value input:focus {
+            border-color: #8b5cf6;
+        }
+        .profile-row .value .save-btn {
+            background: rgba(99, 102, 241, 0.3);
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            color: #cbd5e1;
+            font-size: 12px;
+            cursor: default;
+        }
+        .profile-row .value .save-btn:active {
+            background: #6366f1;
+            color: #fff;
+        }
+
+        .setting-edit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .setting-edit input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 4px 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            width: 60px;
+            outline: none;
+        }
+        .setting-edit input:focus {
+            border-color: #8b5cf6;
+        }
+        .setting-edit .save-btn {
+            background: rgba(99, 102, 241, 0.3);
+            border: none;
+            border-radius: 6px;
+            padding: 4px 12px;
+            color: #cbd5e1;
+            font-size: 12px;
+            cursor: default;
+        }
+        .setting-edit .save-btn:active {
+            background: #6366f1;
+            color: #fff;
+        }
+
+        .history-list {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 4px 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 8px;
+        }
+        .history-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-item .left .title {
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .history-item .left .desc {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        .history-item .right .time {
+            color: #64748b;
+            font-size: 12px;
+        }
+        .history-more-btn {
+            text-align: center;
+            padding: 10px 0;
+            color: #8b5cf6;
+            font-size: 14px;
+            cursor: pointer;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .history-more-btn:active {
+            color: #a78bfa;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .menu-grid .menu-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: default;
+        }
+        .menu-grid .menu-item:active {
+            background: rgba(99, 102, 241, 0.2);
+        }
+        .menu-grid .menu-item .icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+        .menu-grid .menu-item .label {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        /* 子视图 */
+        #profileSubView {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        #profileSubView.active {
+            display: flex;
+        }
+        .sub-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0 16px;
+            flex-shrink: 0;
+        }
+        .sub-header .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .sub-header .title {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .sub-content {
+            flex: 1;
+        }
+        .sub-content .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .sub-content .setting-item .label {
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+        .sub-content .setting-item .desc {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .sub-content .toggle {
+            width: 44px;
+            height: 24px;
+            border-radius: 12px;
+            background: #1e293b;
+            position: relative;
+            cursor: default;
+        }
+        .sub-content .toggle.active {
+            background: #8b5cf6;
+        }
+        .sub-content .toggle .thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: 0.2s;
+        }
+        .sub-content .toggle.active .thumb {
+            left: 22px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: absolute;
+            bottom: 16px;
+            left: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-around;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #64748b;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .nav-item .icon {
+            font-size: 22px;
+            line-height: 1.2;
+        }
+        .nav-item.active {
+            color: #8b5cf6;
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #1e293b;
+            border-radius: 28px;
+            max-width: 340px;
+            width: 100%;
+            padding: 28px 24px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: fadeSlide 0.25s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-box .modal-title {
+            color: #f1f5f9;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-box .modal-body {
+            color: #cbd5e1;
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .modal-box .modal-close {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .modal-box .modal-close:active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .modal-box .modal-body strong {
+            color: #e2e8f0;
+        }
+        .modal-box .modal-body .highlight {
+            color: #facc15;
+        }
+        .modal-box .modal-body .danger {
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="page-container" id="app">
+
+            <!-- ========== 首页（播报/预警） ========== -->
+            <div class="page active" id="page-home">
+                <div class="assistant-header">
+                    <div class="avatar">🧠</div>
+                    <div class="assistant-info">
+                        <div class="name" id="homeProjectName">隧道智能体 <span class="context-tag" id="homeProjectTag">19号线22标</span></div>
+                        <div class="status"><span class="dot"></span> 在线 · 第<span id="homeRingDisplay">128</span>环掘进中</div>
+                    </div>
+                </div>
+                <div class="bubble-wrapper">
+                    <div class="bubble">
+                        <div class="time"><span>今天 11:28</span><span class="badge">第128环</span></div>
+                        <div class="title">📢 环掘进总结 <span class="tag">良好</span></div>
+                        <div class="content">
+                            <strong>推进压力</strong> 12.3 MPa ✓ (目标 12.0)<br>
+                            <strong>刀盘扭矩</strong> 85% ✓ (目标 80%)<br>
+                            <strong>螺旋机转速</strong> 12.5 r/min<br>
+                            <strong>注浆压力</strong> 11.2 MPa ✓
+                        </div>
+                        <div class="extra">
+                            <span class="chip" onclick="showDetail('broadcast')">🔊 播报</span>
+                            <span class="chip" onclick="showDetail('detail')">📋 详情</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bubble-wrapper">
+                    <div class="bubble bubble-warning">
+                        <div class="time"><span>今天 10:05</span><span class="badge" style="background:#ef444420;color:#f87171;">紧急</span></div>
+                        <div class="title">⚠️ 注浆压力超限 <span class="tag warn">未处理</span></div>
+                        <div class="content">
+                            当前值 <strong style="color:#f87171;">15.6 MPa</strong>，阈值 12.0 MPa<br>建议：立即降低注浆速率，检查管路
+                        </div>
+                        <div class="extra">
+                            <span class="chip" onclick="showDetail('disposed')">✅ 已处置</span>
+                            <span class="chip" onclick="showDetail('view')">🔍 查看</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="divider-text">— 今日已播报 3 条 —</div>
+                <div class="suggestions">
+                    <span class="pill">📊 查看今日数据</span>
+                    <span class="pill" onclick="switchPage('page-qa')">💬 问智能体</span>
+                    <span class="pill" onclick="switchPage('page-control')">⚙️ 调整参数</span>
+                </div>
+            </div>
+
+            <!-- ========== 问答 ========== -->
+            <div class="page" id="page-qa">
+                <div class="assistant-header" style="flex-shrink:0;">
+                    <div class="avatar" style="width:44px;height:44px;font-size:20px;">💬</div>
+                    <div class="assistant-info">
+                        <div class="name" style="font-size:18px;">智能问答</div>
+                        <div class="status">随时提问，即刻解答</div>
+                    </div>
+                </div>
+                <div class="qa-quick-tags">
+                    <span class="tag" onclick="fillQAInput('当前掘进参数是否正常？')">📊 参数正常吗</span>
+                    <span class="tag" onclick="fillQAInput('为什么推进压力偏高？')">⚙️ 压力偏高</span>
+                    <span class="tag" onclick="fillQAInput('第128环控制评价如何？')">📋 环评价</span>
+                    <span class="tag" onclick="fillQAInput('当前地质适合什么参数？')">🪨 地质建议</span>
+                </div>
+                <div class="qa-chat-area" id="qaChatArea">
+                    <div class="msg msg-assistant">👋 你好，我是隧道智能体。关于<span id="qaProjectHint">19号线22标</span>的掘进情况，随时问我。</div>
+                </div>
+
+                <!-- 输入栏 -->
+                <div class="qa-input-bar">
+                    <textarea id="qaInput" placeholder="输入您的问题" rows="2"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendQAMessage();">
+                        <span class="send-icon">➤</span>
+                        <span class="spinner"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========== 控制目标 ========== -->
+            <div class="page" id="page-control">
+                <div class="control-header">
+                    <span class="back" onclick="switchPage('page-home')">←</span>
+                    控制目标
+                    <span style="font-size:14px;font-weight:400;color:#64748b;margin-left:auto;" id="controlProjectHint">19号线22标</span>
+                </div>
+                <div class="param-group">
+                    <div class="param-item"><div class="info"><div class="label">推进压力</div><div class="current">当前 <span class="highlight" id="currentDisplay1">12.3</span> MPa</div></div><div class="control"><input type="range" min="8" max="16" value="12.0" step="0.1" class="slider" data-target="v1"><span class="value" id="v1">12.0</span><span class="unit">MPa</span></div></div>
+                    <div class="param-item"><div class="info"><div class="label">刀盘扭矩上限</div><div class="current">当前 <span class="highlight" id="currentDisplay2">85</span> %</div></div><div class="control"><input type="range" min="60" max="95" value="80" step="1" class="slider" data-target="v2"><span class="value" id="v2">80</span><span class="unit">%</span></div></div>
+                    <div class="param-item"><div class="info"><div class="label">螺旋机转速</div><div class="current">当前 <span class="highlight" id="currentDisplay3">12.5</span> r/min</div></div><div class="control"><input type="range" min="8" max="18" value="12.0" step="0.5" class="slider" data-target="v3"><span class="value" id="v3">12.0</span><span class="unit">r/min</span></div></div>
+                    <div class="param-item"><div class="info"><div class="label">注浆压力上限</div><div class="current">当前 <span class="danger" id="currentDisplay4">15.6</span> MPa ⚠超限</div></div><div class="control"><input type="range" min="8" max="16" value="12.0" step="0.1" class="slider" data-target="v4"><span class="value" id="v4">12.0</span><span class="unit">MPa</span></div></div>
+                    <div class="param-item"><div class="info"><div class="label">推进速度</div><div class="current">当前 <span class="highlight" id="currentDisplay5">48</span> mm/min</div></div><div class="control"><input type="range" min="30" max="70" value="50" step="1" class="slider" data-target="v5"><span class="value" id="v5">50</span><span class="unit">mm/min</span></div></div>
+                </div>
+                <button class="btn-confirm" onclick="confirmControlChanges()">确认修改</button>
+                <div id="saveFeedback" class="save-feedback">✅ 已保存</div>
+                <div class="history-area"><span>📝 修改历史 · 今日 2 次</span></div>
+            </div>
+
+            <!-- ========== "我的"页面 ========== -->
+            <div class="page" id="page-profile">
+                <!-- 主视图 -->
+                <div id="profileMainView" style="display:flex; flex-direction:column; height:100%;">
+                    <div class="assistant-header">
+                        <div class="avatar" style="width:44px;height:44px;font-size:20px;">👤</div>
+                        <div class="assistant-info">
+                            <div class="name" style="font-size:18px;">我的</div>
+                            <div class="status">个人中心</div>
+                        </div>
+                    </div>
+
+                    <!-- 个人信息 -->
+                    <div class="profile-card">
+                        <div class="profile-row">
+                            <span class="label">姓名</span>
+                            <span class="value">
+                                <input type="text" id="editName" value="袁翊珈" style="width:140px;">
+                                <button class="save-btn" onclick="saveName()">保存</button>
+                            </span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="label">身份</span>
+                            <span class="value">
+                                <input type="text" id="editIdentity" value="盾构机司机" style="width:140px;">
+                                <button class="save-btn" onclick="saveIdentity()">保存</button>
+                            </span>
+                        </div>
+                        <div class="profile-row" style="border-bottom:none;">
+                            <span class="label">联系电话</span>
+                            <span class="value">
+                                <input type="text" id="editPhone" value="138****1234" style="width:140px;">
+                                <button class="save-btn" onclick="savePhoneNumber()">保存</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 项目设置 -->
+                    <div class="profile-card" style="border-left:3px solid #8b5cf6;">
+                        <div style="color:#e2e8f0; font-weight:500; font-size:16px; margin-bottom:8px;">⚙️ 项目设置</div>
+                        <div class="profile-row">
+                            <span class="label">项目名称</span>
+                            <div class="setting-edit">
+                                <input type="text" id="editLine" placeholder="线" value="19" style="width:50px;">
+                                <span style="color:#64748b;">号线</span>
+                                <input type="text" id="editSection" placeholder="标" value="22" style="width:50px;">
+                                <span style="color:#64748b;">标</span>
+                                <button class="save-btn" onclick="saveProjectSetting()">保存</button>
+                            </div>
+                        </div>
+                        <div class="profile-row" style="border-bottom:none;">
+                            <span class="label">当前环号</span>
+                            <div class="setting-edit">
+                                <input type="number" id="editRing" value="128" style="width:70px;" min="1">
+                                <span style="color:#64748b;">环</span>
+                                <button class="save-btn" onclick="saveProjectSetting()">保存</button>
+                            </div>
+                        </div>
+                        <div style="margin-top:6px; font-size:12px; color:#475569;">修改后首页、问答、控制页同步更新</div>
+                    </div>
+
+                    <!-- 功能菜单 -->
+                    <div style="color:#e2e8f0; font-weight:500; font-size:16px; margin-bottom:4px;">⚙️ 设置</div>
+                    <div class="menu-grid">
+                        <div class="menu-item" onclick="openSubView('notify')"><div class="icon">🔔</div><div class="label">通知设置</div></div>
+                        <div class="menu-item" onclick="openSubView('theme')"><div class="icon">🎨</div><div class="label">主题偏好</div></div>
+                    </div>
+
+                    <!-- 修改历史 -->
+                    <div style="color:#e2e8f0; font-weight:500; font-size:16px; margin-top:20px; margin-bottom:4px;">📋 我的修改历史</div>
+                    <div class="history-list" id="profileHistoryList"></div>
+                </div>
+
+                <!-- 子视图 -->
+                <div id="profileSubView">
+                    <div class="sub-header">
+                        <span class="back-btn" onclick="closeSubView()">←</span>
+                        <span class="title" id="subViewTitle">标题</span>
+                    </div>
+                    <div class="sub-content" id="subViewContent"></div>
+                </div>
+            </div>
+
+        </div><!-- end page-container -->
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchPage('page-home')"><span class="icon">🏠</span>播报/预警</button>
+            <button class="nav-item" onclick="switchPage('page-qa')"><span class="icon">💬</span>问答</button>
+            <button class="nav-item" onclick="switchPage('page-control')"><span class="icon">⚙️</span>控制</button>
+            <button class="nav-item" onclick="switchPage('page-profile')"><span class="icon">👤</span>我的</button>
+        </div>
+    </div>
+
+    <!-- ========== 模态框 ========== -->
+    <div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeModal()">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">📋 详情</div>
+            <div class="modal-body" id="modalBody">内容加载中…</div>
+            <button class="modal-close" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 模态框控制（与模型4一致）
+        // ============================================================
+        function showDetail(type) {
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+
+            const project = getFullProjectName();
+            const ring = projectSettings.ring;
+
+            let content = '';
+            let titleText = '';
+
+            switch (type) {
+                case 'broadcast':
+                    titleText = '🔊 播报内容';
+                    content =
+                        `【第${ring}环掘进总结】\n` +
+                        `项目：${project}\n` +
+                        `时间：今天 11:28\n\n` +
+                        `📌 推进压力：12.3 MPa（目标 12.0）✅ 正常\n` +
+                        `📌 刀盘扭矩：85%（目标 80%）✅ 正常\n` +
+                        `📌 螺旋机转速：12.5 r/min  ✅ 正常\n` +
+                        `📌 注浆压力：11.2 MPa（目标 ≤12.0）✅ 正常\n\n` +
+                        `综合评价：⭐ 良好，所有参数均在目标范围内，建议继续保持。`;
+                    break;
+                case 'detail':
+                    titleText = '📋 详细数据';
+                    content =
+                        `【第${ring}环 完整数据】\n` +
+                        `项目：${project}\n` +
+                        `时间：2026-07-29 11:28\n\n` +
+                        `🔹 推进压力   12.3 MPa  (目标 12.0)  偏差 +2.5%\n` +
+                        `🔹 刀盘扭矩   85%       (目标 80%)   偏差 +6.25%\n` +
+                        `🔹 螺旋机转速 12.5 r/min (目标 12.0)  偏差 +4.2%\n` +
+                        `🔹 注浆压力   11.2 MPa  (上限 12.0)  余量 0.8 MPa\n` +
+                        `🔹 推进速度   48 mm/min (目标 50)    偏差 -4%\n\n` +
+                        `📊 趋势：所有参数平稳，无异常波动。\n` +
+                        `🔄 建议：可适当提高推进速度至 50 mm/min 以提升效率。`;
+                    break;
+                case 'disposed':
+                    titleText = '✅ 已处置记录';
+                    content =
+                        `【注浆压力超限 处置记录】\n` +
+                        `项目：${project}\n` +
+                        `报警时间：今天 10:05\n` +
+                        `处置时间：今天 10:12\n\n` +
+                        `🔹 超限值：15.6 MPa（阈值 12.0 MPa）\n` +
+                        `🔹 处置措施：立即降低注浆速率至 11.5 MPa，并检查管路有无堵塞。\n` +
+                        `🔹 处置结果：压力已恢复至 11.2 MPa，设备运行正常。\n\n` +
+                        `✅ 已由值班司机 袁翊珈 确认处置，无进一步风险。`;
+                    break;
+                case 'view':
+                    titleText = '🔍 预警详情';
+                    content =
+                        `【注浆压力超限 预警分析】\n` +
+                        `项目：${project} | 第${ring}环\n` +
+                        `报警时间：今天 10:05\n\n` +
+                        `📌 当前值：<span class="danger">15.6 MPa</span>（阈值 12.0 MPa）\n` +
+                        `📌 超限幅度：+30%\n` +
+                        `📌 可能原因：注浆泵压力调节失效 / 管路局部堵塞\n\n` +
+                        `🛠️ 建议措施：\n` +
+                        `  1. 立即降低注浆速率，观察压力变化\n` +
+                        `  2. 检查注浆泵及管路连接处\n` +
+                        `  3. 若持续超限，需停机检查\n\n` +
+                        `⏳ 历史趋势：近3环注浆压力分别为 11.8、12.5、15.6 MPa，呈上升趋势，需重点关注。`;
+                    break;
+                default:
+                    content = '暂无数据';
+            }
+
+            title.textContent = titleText;
+            body.innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // ============================================================
+        // 全局项目设置（与模型4一致）
+        // ============================================================
+        let projectSettings = { line: '19', section: '22', ring: 128 };
+
+        function getFullProjectName() { return projectSettings.line + '号线' + projectSettings.section + '标'; }
+
+        function refreshProjectDisplay() {
+            const full = getFullProjectName();
+            document.getElementById('homeProjectTag').textContent = full;
+            document.getElementById('homeRingDisplay').textContent = projectSettings.ring;
+            document.getElementById('qaProjectHint').textContent = full;
+            document.getElementById('controlProjectHint').textContent = full;
+            document.getElementById('editLine').value = projectSettings.line;
+            document.getElementById('editSection').value = projectSettings.section;
+            document.getElementById('editRing').value = projectSettings.ring;
+        }
+
+        function saveProjectSetting() {
+            const line = document.getElementById('editLine').value.trim() || '19';
+            const section = document.getElementById('editSection').value.trim() || '22';
+            const ring = parseInt(document.getElementById('editRing').value) || 128;
+            projectSettings.line = line;
+            projectSettings.section = section;
+            projectSettings.ring = ring;
+            refreshProjectDisplay();
+            document.querySelectorAll('.setting-edit .save-btn').forEach(b => { b.textContent = '✅';
+                setTimeout(() => b.textContent = '保存', 800); });
+        }
+
+        // ============================================================
+        // 个人信息编辑（与模型4一致）
+        // ============================================================
+        function saveName() {
+            const input = document.getElementById('editName');
+            const val = input.value.trim() || '未命名';
+            const btn = input.parentElement.querySelector('.save-btn');
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '保存', 800);
+        }
+
+        function saveIdentity() {
+            const input = document.getElementById('editIdentity');
+            const val = input.value.trim() || '未设置';
+            const btn = input.parentElement.querySelector('.save-btn');
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '保存', 800);
+        }
+
+        function savePhoneNumber() {
+            const input = document.getElementById('editPhone');
+            const val = input.value.trim() || '未设置';
+            const btn = input.parentElement.querySelector('.save-btn');
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '保存', 800);
+        }
+
+        // ============================================================
+        // 控制目标数据（与模型4一致）
+        // ============================================================
+        const CONTROL_IDS = ['v1', 'v2', 'v3', 'v4', 'v5'];
+        let originalValues = { v1: 12.0, v2: 80, v3: 12.0, v4: 12.0, v5: 50 };
+        let modificationHistory = [
+            { param: '推进压力', oldVal: '11.5 MPa', newVal: '12.0 MPa', time: '2026-07-27 09:00' },
+            { param: '刀盘扭矩上限', oldVal: '75%', newVal: '80%', time: '2026-07-27 08:30' },
+            { param: '螺旋机转速', oldVal: '11.0 r/min', newVal: '12.0 r/min', time: '2026-07-26 16:20' },
+            { param: '注浆压力上限', oldVal: '13.0 MPa', newVal: '12.5 MPa', time: '2026-07-26 14:10' },
+        ];
+
+        function resetControlToOriginal() {
+            CONTROL_IDS.forEach(id => {
+                const slider = document.querySelector(`.slider[data-target="${id}"]`);
+                const display = document.getElementById(id);
+                if (slider && display) {
+                    const val = originalValues[id];
+                    slider.value = val;
+                    display.textContent = Number.isInteger(val) ? val : val.toFixed(1);
+                }
+            });
+            document.getElementById('saveFeedback').classList.remove('show');
+        }
+
+        function confirmControlChanges() {
+            let newVals = {},
+                changed = false,
+                changeDesc = [];
+            CONTROL_IDS.forEach(id => {
+                const slider = document.querySelector(`.slider[data-target="${id}"]`);
+                if (slider) {
+                    const newVal = parseFloat(slider.value);
+                    newVals[id] = newVal;
+                    if (newVal !== originalValues[id]) {
+                        changed = true;
+                        const names = { v1: '推进压力', v2: '刀盘扭矩上限', v3: '螺旋机转速', v4: '注浆压力上限', v5: '推进速度' };
+                        const units = { v1: 'MPa', v2: '%', v3: 'r/min', v4: 'MPa', v5: 'mm/min' };
+                        changeDesc.push({ param: names[id], oldVal: originalValues[id] + ' ' + units[id], newVal: newVal +
+                                ' ' + units[id] });
+                    }
+                }
+            });
+            if (!changed) {
+                const fb = document.getElementById('saveFeedback');
+                fb.textContent = '⚠️ 未检测到修改';
+                fb.classList.add('show');
+                setTimeout(() => { fb.classList.remove('show');
+                    fb.textContent = '✅ 已保存'; }, 1500);
+                return;
+            }
+            originalValues = { ...newVals };
+            const now = new Date();
+            const ts = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate())
+                .padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes())
+                .padStart(2, '0');
+            changeDesc.forEach(item => {
+                modificationHistory.unshift({ param: item.param, oldVal: item.oldVal, newVal: item.newVal, time: ts });
+            });
+            if (modificationHistory.length > 20) modificationHistory.pop();
+            renderProfileHistory();
+            const fb = document.getElementById('saveFeedback');
+            fb.textContent = '✅ 已保存';
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 2500);
+        }
+
+        let historyExpanded = false;
+
+        function renderProfileHistory() {
+            const container = document.getElementById('profileHistoryList');
+            if (!container) return;
+            if (modificationHistory.length === 0) {
+                container.innerHTML = `
+                        <div style="padding:16px 20px;color:#64748b;text-align:center;font-size:14px;">暂无修改记录</div>
+                        <div style="height:100px;"></div>
+                    `;
+                return;
+            }
+            const showCount = historyExpanded ? modificationHistory.length : Math.min(2, modificationHistory.length);
+            let html = '';
+            for (let i = 0; i < showCount; i++) {
+                const item = modificationHistory[i];
+                html += `<div class="history-item"><div class="left"><div class="title">${item.param}</div><div class="desc">${item.oldVal} → ${item.newVal}</div></div><div class="right"><span class="time">${item.time}</span></div></div>`;
+            }
+            if (modificationHistory.length > 2) {
+                const btnText = historyExpanded ? '收起' : '查看更多';
+                html += `<div class="history-more-btn" onclick="toggleHistory()">${btnText}</div>`;
+            }
+            html += `<div style="height:100px;"></div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleHistory() {
+            historyExpanded = !historyExpanded;
+            renderProfileHistory();
+        }
+
+        // ============================================================
+        // 子视图（与模型4一致）
+        // ============================================================
+        function openSubView(type) {
+            const main = document.getElementById('profileMainView');
+            const sub = document.getElementById('profileSubView');
+            main.style.display = 'none';
+            sub.classList.add('active');
+
+            const titleMap = { notify: '通知设置', theme: '主题偏好' };
+            document.getElementById('subViewTitle').textContent = titleMap[type] || '设置';
+
+            const content = document.getElementById('subViewContent');
+            let html = '';
+            if (type === 'notify') {
+                html = `
+                        <div class="setting-item"><span class="label">🔔 推送通知</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="thumb"></div></div></div>
+                        <div class="setting-item"><span class="label">📢 播报提醒</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="thumb"></div></div></div>
+                        <div class="setting-item"><span class="label">⚠️ 预警通知</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="thumb"></div></div></div>
+                        <div style="margin-top:16px; color:#94a3b8; font-size:14px;">点击开关切换状态</div>
+                    `;
+            } else if (type === 'theme') {
+                html = `
+                        <div class="setting-item"><span class="label">🌙 深色模式</span><div class="toggle active" onclick="this.classList.toggle('active')"><div class="thumb"></div></div></div>
+                        <div class="setting-item"><span class="label">☀️ 浅色模式</span><div class="toggle" onclick="this.classList.toggle('active')"><div class="thumb"></div></div></div>
+                        <div style="margin-top:16px; color:#94a3b8; font-size:14px;">当前为深色模式（默认）</div>
+                    `;
+            }
+            content.innerHTML = html;
+        }
+
+        function closeSubView() {
+            document.getElementById('profileMainView').style.display = 'flex';
+            document.getElementById('profileSubView').classList.remove('active');
+            renderProfileHistory();
+        }
+
+        // ============================================================
+        // 页面切换（与模型4一致）
+        // ============================================================
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            const map = { 'page-home': 0, 'page-qa': 1, 'page-control': 2, 'page-profile': 3 };
+            const idx = map[pageId];
+            document.querySelectorAll('.bottom-nav .nav-item').forEach((item, i) => item.classList.toggle('active', i ===
+            idx));
+            if (pageId === 'page-control') resetControlToOriginal();
+            if (pageId === 'page-profile') {
+                renderProfileHistory();
+                refreshProjectDisplay();
+                closeSubView();
+            }
+            if (pageId === 'page-qa') {
+                const area = document.getElementById('qaChatArea');
+                setTimeout(() => area.scrollTop = area.scrollHeight, 100);
+            }
+        }
+
+        // 滑块更新
+        document.querySelectorAll('.slider').forEach(slider => {
+            const targetId = slider.dataset.target;
+            const display = document.getElementById(targetId);
+            if (display) {
+                const update = () => {
+                    const val = parseFloat(slider.value);
+                    display.textContent = Number.isInteger(val) ? val : val.toFixed(1);
+                    document.getElementById('saveFeedback').classList.remove('show');
+                };
+                slider.addEventListener('input', update);
+                update();
+            }
+        });
+
+        // ============================================================
+        // 问答 - 模拟回复（不调用任何API，永不报错）
+        // ============================================================
+        const qaInput = document.getElementById('qaInput');
+        const sendBtn = document.getElementById('sendBtn');
+        let isLoading = false;
+
+        // 模拟回复函数（与模型3逻辑一致）
+        function getSimulatedReply(question) {
+            const q = question.toLowerCase();
+            if (q.includes('压力') || q.includes('参数')) {
+                return '📊 当前推进压力 12.3 MPa，在目标值 12.0 附近。刀盘扭矩 85%，螺旋机转速 12.5 r/min，注浆压力 11.2 MPa，整体参数良好。';
+            } else if (q.includes('评价') || q.includes('环')) {
+                return '📋 第128环控制评价为“良好”。所有掘进参数均在设计范围内，无异常报警。';
+            } else if (q.includes('地质') || q.includes('适合')) {
+                return '🪨 当前地层为中风化泥岩，建议推进压力 11.5~12.5 MPa，刀盘扭矩 75%~85%，螺旋机转速 11~13 r/min。';
+            } else {
+                return '🤖 收到问题：“' + question + '”。正在分析数据……（模拟回复）建议您查看具体参数或咨询现场工程师。';
+            }
+        }
+
+        async function sendQAMessage() {
+            const text = qaInput.value.trim();
+            if (!text || isLoading) return;
+
+            const area = document.getElementById('qaChatArea');
+
+            // 显示用户消息
+            const um = document.createElement('div');
+            um.className = 'msg msg-user';
+            um.textContent = text;
+            area.appendChild(um);
+
+            qaInput.value = '';
+            qaInput.style.height = 'auto';
+
+            // 设置加载状态（仅用于视觉反馈，不实际调用API）
+            isLoading = true;
+            sendBtn.classList.add('loading');
+            qaInput.disabled = true;
+
+            // 显示“思考中”占位
+            const th = document.createElement('div');
+            th.className = 'msg msg-assistant';
+            th.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+            th.id = 'thinking-placeholder';
+            area.appendChild(th);
+            area.scrollTop = area.scrollHeight;
+
+            // 模拟延迟回复（无任何网络请求，绝不会报错）
+            setTimeout(() => {
+                const ph = document.getElementById('thinking-placeholder');
+                if (ph) ph.remove();
+
+                const reply = getSimulatedReply(text);
+                const am = document.createElement('div');
+                am.className = 'msg msg-assistant';
+                am.textContent = reply;
+                area.appendChild(am);
+                area.scrollTop = area.scrollHeight;
+
+                // 恢复输入状态
+                isLoading = false;
+                sendBtn.classList.remove('loading');
+                qaInput.disabled = false;
+                qaInput.focus();
+            }, 1200);
+        }
+
+        // Ctrl+Enter 发送
+        qaInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                sendQAMessage();
+            }
+        });
+
+        // 点击快捷标签填入内容
+        function fillQAInput(text) {
+            qaInput.value = text;
+            qaInput.focus();
+            qaInput.setSelectionRange(text.length, text.length);
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        window.onload = function() {
+            refreshProjectDisplay();
+            renderProfileHistory();
+            document.getElementById('profileSubView').classList.remove('active');
+            document.getElementById('profileMainView').style.display = 'flex';
+        };
+    </script>
+</body>
+</html>
